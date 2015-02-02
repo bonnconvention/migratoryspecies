@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Practice Example feature.
+ */
+
+include_once 'practice_example.features.inc';

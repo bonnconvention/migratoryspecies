@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the E-Community Views feature.
+ */
+
+include_once 'e_community_views.features.inc';

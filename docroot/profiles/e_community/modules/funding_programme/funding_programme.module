@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the Funding Programme feature.
+ */
+
+include_once 'funding_programme.features.inc';

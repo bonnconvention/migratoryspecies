@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the NFP Manual feature.
+ */
+
+include_once 'nfp_manual.features.inc';

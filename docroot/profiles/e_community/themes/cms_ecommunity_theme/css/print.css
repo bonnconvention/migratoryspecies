@@ -1,0 +1,156 @@
+/* print-friendly pages */
+@media print {
+  .admin-search-logos,
+  .breadcrumb,
+  footer,
+  .block-quicktabs a:after,
+  .view--cms-instruments-slideshow a:after,
+  #site-map a:after,
+  .feed-link,
+  .view-introduction-page-cms-instruments a:after,
+  .node-cms-instrument a:after,
+  .ws-countries a:after,
+  .form-group a:after,
+  .node-type-family-websites .form-type-textfield,
+  .generic-pagination a:after,
+  .view-documents a:after,
+  .ws-projects a:after,
+  .ws-wg a:after,
+  .ws-campaigns a:after,
+  .ws-awards a:after,
+  .ws-species a:after,
+  .ws-publications a:after,
+  #toolbar,
+  .tabs--primary.nav-tabs,
+  .user-picture a:after,
+  .media-heading a:after,
+  .page-e-community a:after,
+  .field-type-taxonomy-term-reference a:after,
+  .comment-wrapper,
+  .view-members .views-widget-filter-field_first_name_value,
+  .view-members .views-widget-filter-field_last_name_value,
+  .views-widget-per-page,
+  .page-members a:after,
+  .page-user a:after,
+  .privatemsg-send-link,
+  .page-nfp-manual-chapters a:after,
+  .page-nfp-manual-chapters .right-column,
+  .page-taxonomy .right-column,
+  .node-type-nfp-manual #block-block-7, /* RSS */
+  .view-resource-area a:after,
+  .rate-info,
+  .view-practice-examples .search-button,
+  .view-practice-examples a:after,
+  .page-practical-examples .right-column,
+  .node-type-practice-example .right-column a:after,
+  .view-checklists a:after,
+  .page-checklists .right-column,
+  .node-type-community-checklist a:after,
+  .view-funding-programmes a:after,
+  .page-funding-programmes .right-column,
+  .view-funding-programmes .search-button,
+  .node-type-funding-programme .right-column,
+  .view-training-events-view .search-button,
+  .page-training-events a:after,
+  .page-training-events #block-block-5, /* RSS */
+  .node-type-event-calendar .right-column a:after,
+  .node-type-event-calendar #block-block-5 /* RSS */,
+  .page-forum a:after,
+  .page-faq .right-column,
+  .page-taxonomy a:after,
+  .page-messages a:after,
+  .ws-news a:after,
+  .ws-upcoming-meetings-all a:after {
+  display: none;
+  }
+
+  body .navbar-collapse.collapse,
+  .node-readmore,
+  .comment-add {
+  display: none !important;
+  }
+
+  a:after {
+  color: #0066C0 !important;
+  font-size: 11pt;
+  }
+
+  .down-area {
+  margin-left: 0;
+  }
+
+  .logo-title,
+  .article-body {
+  margin-top: 20pt;
+  }
+
+  .portal-title {
+  font-size: 27px;
+  }
+
+  .portal-title:after {
+  content: "www.migratoryspecies.org";
+  color: #0066C0;
+  display: block;
+  font-size: 12pt;
+  font-weight: normal;
+  padding-left: 20pt;
+  }
+
+  .row-offcanvas header .container,
+  .row-offcanvas .container {
+  margin-left: 0;
+  max-width: 100%;
+  }
+
+  .page-header {
+  font-size: 24px;
+  color: #777 !important;
+  }
+
+  body h2 {
+  font-size: 18pt;
+  }
+
+  .front #calendar .fc-grid .fc-day-number {
+  text-align: left;
+  }
+
+  .front #calendar .fc-state-default.fc-corner-right,
+  .front #calendar .fc-state-default.fc-corner-left,
+  .generic-pagination {
+  border: 0;
+  }
+
+  body.toolbar-drawer {
+  padding-top: 0 !important;
+  }
+
+  .rating ul {
+  padding-left: 0;
+  width: 100%;
+  }
+
+  .rate-widget-thumbs_up_down ul li {
+  display: inline-block;
+  min-width: 115px;
+  font-size: 11pt;
+  }
+
+  .rating .thumb-up:before {
+  content: "Thumbs up:";
+  color: #5FBB46;
+  margin-right: 10px;
+  }
+
+  .rating .thumb-down:before {
+  content: "Thumbs down:";
+  color: #FBB034;
+  margin-left: 10px;
+  }
+
+  .view-documents .view-filters {
+  position: relative;
+  width: 400px;
+  }
+}

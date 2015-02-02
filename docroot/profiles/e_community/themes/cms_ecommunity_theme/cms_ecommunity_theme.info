@@ -1,0 +1,76 @@
+name = E-Community Theme
+description = E-Community Theme - a Bootstrap Sub-theme.
+core = 7.x
+base theme = bootstrap
+
+; Regions
+regions[navigation]     = 'Navigation'
+regions[header]         = 'Top Bar'
+regions[secondary_menu] = 'Secondary Menu'
+regions[highlighted]    = 'Highlighted'
+regions[help]           = 'Help'
+regions[content]        = 'Content'
+;regions[sidebar_first]  = 'Primary'
+regions[slide_instruments] = 'Slideshow Instruments'
+regions[sidebar_second] = 'Secondary'
+regions[footer_first_row_left] = 'FooterFirstRowLeft'
+regions[footer_first_row_right] = 'FooterFirstRowRight'
+regions[footer_second_row_left] = 'FooterSecondRowLeft'
+regions[footer_second_row_right] = 'FooterSecondRowRight'
+ 
+; Stylesheets
+stylesheets[all][] = css/style.css
+stylesheets[all][] = css/custom.css
+stylesheets[all][] = css/mobile.css
+
+;**********************************
+; METHOD 1: Bootstrap Source Files
+;**********************************
+ 
+; Scripts
+ 
+scripts[] = 'bootstrap-3.0.0/js/affix.js'
+scripts[] = 'bootstrap-3.0.0/js/alert.js'
+scripts[] = 'bootstrap-3.0.0/js/button.js'
+scripts[] = 'bootstrap-3.0.0/js/carousel.js'
+scripts[] = 'bootstrap-3.0.0/js/collapse.js'
+scripts[] = 'bootstrap-3.0.0/js/dropdown.js'
+scripts[] = 'bootstrap-3.0.0/js/modal.js'
+scripts[] = 'bootstrap-3.0.0/js/tooltip.js'
+scripts[] = 'bootstrap-3.0.0/js/popover.js'
+scripts[] = 'bootstrap-3.0.0/js/scrollspy.js'
+scripts[] = 'bootstrap-3.0.0/js/tab.js'
+scripts[] = 'bootstrap-3.0.0/js/transition.js'
+; Settings inherited by base theme, uncomment to override.
+;settings[toggle_name] = 0
+;settings[toggle_search] = 1
+; Disable the CDN as we are using our own source files.
+
+; Breadcrumbs
+settings[bootstrap_cdn] = ''
+settings[bootstrap_breadcrumb_home] = 1
+
+
+;*************************
+; METHOD 2: Bootstrap CDN
+;*************************
+; 
+; ; Settings inherited by base theme, uncomment to override.
+; ;settings[toggle_name] = 0
+; ;settings[toggle_search] = 1
+; ;settings[cdn_bootstrap] = 1
+; ;settings[bootstrap_cdn] = 3.0.0
+
+; Information added by fserver
+core = "7.x"
+datestamp = "1383059292"
+project = "cms_ecommunity_theme"
+project status url = "http://fserver.eaudeweb.ro/fserver"
+version = "7.x-1.11"
+
+; Information added by fserver
+core = "7.x"
+datestamp = "1414684016"
+project = "cms_ecommunity_theme"
+project status url = "http://fserver.eaudeweb.ro/fserver"
+version = "7.x-2.31"

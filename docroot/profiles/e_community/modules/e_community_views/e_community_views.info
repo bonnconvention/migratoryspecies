@@ -1,0 +1,25 @@
+name = E-Community Views
+description = Customized CMS e-community Views
+core = 7.x
+package = E-Community
+version = 7.x-1.10
+project = e_community_views
+dependencies[] = ctools
+dependencies[] = features
+dependencies[] = views
+datestamp = 1383810357
+features[ctools][] = views:views_default:3.0
+features[features_api][] = api:2
+features[user_permission][] = administer views
+features[views_view][] = checklists
+features[views_view][] = faq
+features[views_view][] = practice_examples
+features[views_view][] = resource_area
+features[views_view][] = training_events_view
+
+; Information added by fserver
+core = "7.x"
+datestamp = "1384441219"
+project = "e_community_views"
+project status url = "http://fserver.eaudeweb.ro/fserver"
+version = "7.x-1.10"

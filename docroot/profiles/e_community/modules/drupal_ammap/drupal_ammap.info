@@ -1,0 +1,14 @@
+name = Drupal Ammap
+description = Drupal Ammap Module
+core = 7.x
+package = CMS
+version = 7.x-0.7
+project = drupal_ammap
+configure = admin/config/content/drupal_ammap
+
+; Information added by fserver
+core = "7.x"
+datestamp = "1403169505"
+project = "drupal_ammap"
+project status url = "http://fserver.eaudeweb.ro/fserver"
+version = "7.x-0.9"

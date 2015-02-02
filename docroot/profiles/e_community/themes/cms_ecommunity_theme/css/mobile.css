@@ -1,0 +1,677 @@
+/* MOBILE DEVICES */
+
+/* tablets under 1024x768px */
+@media (max-width: 1023px) {
+
+
+  /* header */
+  .logo {
+  padding-top: 0;
+  }
+
+  .right-header.col-sm-11 {
+  padding-right: 0;
+  }
+
+  .region-header {
+  width: 76%;
+  }
+
+  form#search-block-form {
+  margin-left: 10px;
+  }
+
+  .global-menu {
+  padding-left: 0;
+  }
+
+  .global-menu.nav-show-level-2 {
+  margin-bottom: 38px;
+  border-bottom: 0;
+  }
+
+  .global-menu.nav-show-level-3 {
+  margin-bottom: 56px;
+  }
+
+  body .global-menu > li > ul .active-trail.dropdown-submenu {
+  background-image: none;
+  }
+
+
+  /* homepage */
+  .view-migration-slideshow img,
+  .view-migration-slideshow .views-field-title,
+  .view-migration-slideshow .views-field-field-slide-caption {
+  width: 720px;
+  }
+
+  .view-migration-slideshow .views-field-field-slide-copyright div {
+  width: 680px;
+  }
+
+  .view-migration-slideshow img {
+  height: 374px;
+  }
+
+  .species-custom-image-author {
+  text-align: center;
+  }
+
+  #block-random-species-random-species p a {
+  padding-left: 0;
+  }
+
+
+  /* footer */
+  .well-footer {
+  padding: 10px;
+  }
+
+  .footer-menu ul li {
+  width: 17%;
+  }
+
+  .footer-menu .dropdown-menu {
+  min-width: 120px;
+  }
+
+  .region-footer-second-row-right ul {
+  margin-top: 20px;
+  }
+
+  .region-footer-second-row-right ul .leaf {
+  background: none;
+  display: block;
+  text-align: left;
+  }
+
+}
+
+
+/* tablets with less than/equal 800x600px */
+@media (max-width: 800px) {
+
+
+  /* header */
+  .down-area {
+  margin-top: 0;
+  }
+
+  .region-header {
+  width: 70%;
+  }
+
+  .logo {
+  margin-top: 5px;
+  }
+
+  .small-logos img,
+  .breadcrumb {
+  display: none;
+  }
+
+  .small-logos .CMS-logo-small {
+  display: inline-block;
+  background: url("../images/CMS_logo_32x34px.png") 100% 0% no-repeat;
+  height: 34px;
+  width: 32px;
+  }
+
+  .small-logos .UNEP-logo {
+  background: url("../images/UNEP_logo_32x34px.png") 100% 0% no-repeat;
+  height: 34px;
+  width: 32px;
+  }
+
+  .global-menu > li {
+  border-right: 0;
+  display: block;
+  text-align: left;
+  }
+
+  .front .global-menu > li > div.submenu-teaser > ul {
+  display: none;
+  }
+
+  body .global-menu.nav-show-level-2 .dropdown-menu {
+  width: 100% !important;
+  }
+
+  .visible-800 {
+  display: block;
+  }
+
+  .navbar-toggle {
+  float: left;
+  }
+
+  .navbar-collapse.collapse,
+  .navbar-inverse.submenu {
+  display: none !important;
+  }
+
+  .search-area-and-logos {
+  height: 44px;
+  padding-right: 0;
+  margin-top: 5px;
+  background-image: none;
+  }
+
+  .logo-title {
+  margin-top: 0;
+  }
+
+  .user-menu {
+  padding-left: 10px;
+  margin-top: 10px;
+  }
+
+  .language-menu {
+  margin-top: 10px;
+  }
+
+  .admin-search-logos {
+  border-bottom: 1px solid #DDD;
+  }
+
+  .portal-title {
+  margin-top: 15px;
+  }
+
+  body .search-area-and-logos {
+  margin-right: 0;
+  }
+
+  .top-user-menu {
+  margin-left: 0;
+  }
+
+  .logged-in .navbar-default {
+  margin-top: 40px; /* to be deleted if the admin menu for Drupal is deactivated */
+  }
+
+  .navbar-default .navbar-toggle,
+  .navbar-default .navbar-toggle:hover,
+  .navbar-default .navbar-toggle:focus {
+  background: #444;
+  border-color: #FFF;
+  }
+
+  .navbar-default .navbar-toggle .icon-bar {
+  background: #FFF;
+  }
+
+
+  /* mobile menu */
+  body {
+  overflow-x: hidden;
+  }
+
+  #navbar .global-menu,
+  #navbar .global-menu-bar,
+  .sidebar-offcanvas .caret {
+  display: none;
+  }
+
+  .row-offcanvas {
+  position: relative;
+  -webkit-transition: all 0.25s ease-out;
+  -moz-transition: all 0.25s ease-out;
+  transition: all 0.25s ease-out;
+  }
+
+  .row-offcanvas-right
+  .sidebar-offcanvas {
+  right: -75%;
+  }
+
+  .row-offcanvas-left
+  .sidebar-offcanvas {
+  left: -75%;
+  }
+
+  .row-offcanvas-right.active {
+  right: 75%;
+  }
+
+  .row-offcanvas-left.active {
+  left: 75%;
+  }
+
+  .sidebar-offcanvas {
+  display: none;
+  position: absolute;
+  top: 0;
+  width: 75%;
+  padding-right: 0;
+  padding-left: 0;
+  background: #444;
+  }
+
+  .sidebar-offcanvas nav ul {
+  display: block;
+  float: none;
+  max-width: none;
+  width: auto;
+  margin: 0;
+  padding: 0;
+  }
+
+  .sidebar-offcanvas nav > ul ul {
+  display: none;
+  position: relative;
+  width: 100%;
+  background: #616161;
+  border: 0;
+  }
+
+  .sidebar-offcanvas nav > ul ul ul {
+  display: none;
+  position: relative;
+  width: 100%;
+  background: #888888;
+  border: 0;
+  }
+
+  .logged-in .sidebar-offcanvas nav > ul ul {
+  margin-top: 0;
+  }
+
+  .sidebar-offcanvas nav > ul li {
+  display: block;
+  }
+
+  .sidebar-offcanvas nav > ul li h2 {
+  font-size: 1.2em;
+  padding: 0;
+  margin: 0;
+  }
+
+  .sidebar-offcanvas nav > ul li h2 a {
+  display: block;
+  float: none;
+  padding: .8em;
+  padding-left: 38px;
+  border-bottom: 1px solid #555;
+  color: #FFF;
+  }
+  .sidebar-offcanvas nav > ul li h2 span.glyphicon {
+  float: left;
+  color:#fff;
+  padding: .6em;
+  cursor: pointer;
+  font-size: 19px;
+  }
+
+  .sidebar-offcanvas nav > ul li.last ul h2 a {
+  border-bottom-width: 1px;
+  }
+
+  .sidebar-offcanvas nav > ul > li > ul > li h2 a {
+  padding-left: 50px;
+  }
+
+  .sidebar-offcanvas nav > ul > li > ul > li > ul > li h2 a {
+  padding-left: 60px;
+  }
+
+  .logged-in .sidebar-offcanvas nav ul {
+  margin-top: 105px;
+  }
+
+
+  /* footer */
+  .footer-menu ul li {
+  width: 100%;
+  }
+
+
+  /* tabbed menu on homepage, transformed into accordion */
+  .block-quicktabs .ui-accordion-header {
+  padding-top: 12px;
+  }
+
+  .block-quicktabs .ui-accordion-header a {
+  text-transform: uppercase;
+  }
+
+  .block-quicktabs .ui-accordion-content {
+  min-height: 400px;
+  padding: 16px;
+  }
+
+
+  /* articles */
+  .article-body div,
+  .article-body img {
+  float: none !important; /* cancels the float property for images, so pictures don't overlap anymore the article text */
+  }
+
+
+  /* Funding Programmes,
+      Publications listing,
+      Projects listing,
+      Working Groups listing,
+      Campaigns listing,
+      Awards listing,
+      News listing,
+      Practical Examples listing,
+      Training Events,
+      Documents listing */
+  .view-funding-programmes ul li,
+  .ws-publications li,
+  .ws-projects li,
+  .ws-wg li,
+  .ws-campaigns li,
+  .ws-awards li,
+  .ws-news li,
+  .ws-upcoming-meetings-all li,
+  .view-practice-examples li,
+  .center-column .view-training-events-view .views-row {
+  background-color: #F5F5F5;
+  border: 1px solid #E3E3E3;
+  border-radius: 4px;
+  padding: 10px;
+  }
+
+  .ws-campaigns .field-image,
+  .ws-news .field-image,
+  .view-practice-examples .views-field-field-practice-ex-images,
+  .view-funding-programmes .views-field-field-fund-prog-image {
+  width: 100%;
+  margin-bottom: 10px;
+  }
+
+  .ws-campaigns .views-field,
+  .ws-campaigns .field-title,
+  .ws-campaigns .field-summary,
+  .ws-news .views-field,
+  .ws-news .field-title,
+  .view-practice-examples .views-field,
+  .view-funding-programmes .views-field {
+  margin-left: 0;
+  }
+
+  .view-practice-examples .view-filters #edit-reset {
+  margin-top: 10px;
+  }
+
+  #funding-programmes-filters .help-block,
+  #training-events-filters .help-block {
+  min-width: 100px;
+  }
+
+  #views-exposed-form-funding-programmes-page .views-exposed-widget label,
+  #views-exposed-form-training-events-view-page-4 .views-exposed-widget label {
+  width: 150px;
+  }
+
+  .view-funding-programmes .row {
+  position: relative;
+  min-height: 220px;
+  }
+
+  .view-training-events-view .row {
+  position: relative;
+  min-height: 280px;
+  }
+
+  .view-practice-examples .row {
+  position: relative;
+  min-height: 140px;
+  }
+
+  .generic-pagination .row {
+  min-height: 40px;
+  }
+
+  .view-funding-programmes .form-group.search-button,
+  .view-training-events-view .form-group.search-button,
+  .view-practice-examples .form-group.search-button {
+  position: absolute;
+  bottom: -25px;
+  }
+
+  .view-practice-examples .view-filters #edit-reset {
+  margin-top: 0;
+  }
+
+  .view-documents .view-filters {
+  position: relative;
+  left: 0;
+  }
+
+  /* Funding Programme profile */
+  .node-event-calendar .article-body .field,
+  .node-funding-programme .article-body .field {
+  width: 100%;
+  }
+
+  /* Related content tabs */
+  .center-column .nav-tabs > li a {
+  border: 1px solid #DDD;
+  border-bottom-color: rgba(0, 0, 0, 0);
+  background-color: #F5F5F5;
+  }
+
+  .center-column .nav-tabs > li.active a {
+  background: #fff;
+  }
+
+  /* Migration slideshow */
+  .view-migration-slideshow .views-field-title,
+  .view-migration-slideshow .views-field-title-field,
+  .view-migration-slideshow .views-field-field-slide-caption {
+  width: 505px;
+  }
+
+  .view-migration-slideshow .views-field-field-slide-copyright,
+  .view-migration-slideshow .views-field-field-slide-copyright div {
+  width: 465px;
+  }
+}
+
+
+/* smartphones with less than/equal 600px width */
+@media (max-width: 600px) {
+
+  /* header */
+  .top-user-menu {
+  padding-right: 0;
+  }
+
+  body .input-group.search-area .form-control {
+  width: 120px;
+  margin-right: 4px;
+  }
+
+  body .input-group.search-area .form-control:focus {
+  width: 440px;
+  margin-right: 10px;
+  }
+
+  .search-area-and-logos {
+  padding-left: 0;
+  }
+
+  #search-block-form {
+  float: none;
+  }
+}
+
+
+/* smartphones with less than/equal 480px width */
+@media (max-width: 480px) {
+
+ /* header */
+  .breadcrumb  {
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  border-radius: 0px;
+  }
+
+  .down-area {
+  margin-top: 0;
+  }
+
+  .logo-title {
+  margin-top: 0;
+  /*margin-bottom: 10px;*/
+  }
+
+  .top-user-menu,
+  .search-area-and-logos {
+  width: 100%;
+  }
+
+  body .search-area-and-logos {
+  height: 40px;
+  background-image: none;
+  }
+
+  .region-header {
+  width: 98%;
+  }
+
+  form#search-block-form {
+  float: right;
+  }
+
+  .navbar-collapse {
+  border-top: 0;
+  }
+
+  body .input-group.search-area .form-control,
+  body .input-group.search-area .form-control:focus {
+  width: 290px;
+  margin-right: 5px;
+  }
+
+  .logged-in .navbar-default {
+  margin-top: 80px; /* to be deleted if the admin menu for Drupal is deactivated */
+  }
+
+  /* homepage */
+  .view-migration-slideshow .views-field-title,
+  .view-migration-slideshow .views-field-title-field,
+  .view-migration-slideshow .views-field-field-slide-caption {
+  width: 290px;
+  }
+
+  .view-migration-slideshow .views-field-field-slide-copyright,
+  .view-migration-slideshow .views-field-field-slide-copyright div {
+  width: 250px;
+  }
+
+  .view-migration-slideshow img {
+  height: auto;
+  }
+
+  .view-migration-slideshow .views-field-title .field-content,
+  .view-migration-slideshow .views-field-title-field .field-content {
+  min-height: 86px;
+  margin-top: 15px;
+  }
+
+  /* News profile */
+  .profile.col-md-8 img {
+  max-width: 393px;
+  height: auto;
+  }
+
+  /* tabbed menu on homepage, transformed into accordion */
+  .ui-accordion-content .article-body ul li a,
+  .ui-accordion-content .views-field-title,
+  .ui-accordion-content .views-field-title-field,
+  .ui-accordion-content .views-field-field-publication-published-date {
+  display: block;
+  width: 100%;
+  padding-left: 0;
+  }
+
+  /* filters from listing pages */
+  .center-column .dataTables_length {
+  width: 100%;
+  margin-bottom: 10px;
+  }
+
+  .center-column .dataTables_filter {
+  overflow: hidden;
+  width: 100%;
+  }
+
+  body .center-column .dataTables_filter label {
+  float: left;
+  width: auto;
+  }
+
+  div.dataTables_filter input {
+  width: 220px;
+  }
+
+  .view-content.col-md-12 {
+  padding-left: 0;
+  }
+
+  .view-funding-programmes .row,
+  .view-training-events-view .row,
+  .view-practice-examples .row {
+  position: static;
+  min-height: 10px;
+  }
+
+  .view-funding-programmes .form-group.search-button,
+  .view-training-events-view .form-group.search-button,
+  .view-practice-examples .form-group.search-button {
+  position: static;
+  }
+
+  /* Species listing,
+     Documents listing */
+  .ws-species .field-class,
+  .ws-species .field-order,
+  .ws-species .field-family,
+  .view-documents .views-field-sm-vid-Document-type-vocabulary,
+  .view-documents .views-field-php-1,
+  .view-documents .views-field-php {
+  display: none;
+  }
+
+  .view-documents .view-filters {
+  position: relative;
+  left: 0;
+  }
+
+  /* Related content tabs */
+  .center-column .nav-tabs > li {
+  clear: both;
+  }
+
+  .center-column .nav-tabs > li a {
+  min-width: 290px;
+  }
+
+  /* Country profile */
+  #block-ecommunity-country-flag {
+  top: 5px;
+  right: 20px;
+  }
+
+  .view-country-profile .view-content {
+  margin-top: 35px;
+  }
+
+  /* e-community */
+  #views-exposed-form-funding-programmes-page .views-exposed-widget label,
+  #views-exposed-form-training-events-view-page-4 .views-exposed-widget label {
+  text-align: left;
+  }
+
+  #funding-programmes-filters .help-block,
+  #training-events-filters .help-block {
+  margin-top: -53px;
+  margin-left: 90px;
+  position: absolute;
+  }
+}

@@ -1,0 +1,44 @@
+{
+    "db" : {
+        "host": "db",
+        "username" : "root",
+        "password" : "root",
+        "port": 3306,
+        "database" : "",
+        "root_username": "root",
+        "root_password": "root"
+    },
+    "admin" : {
+        "username": "admin",
+        "password": "admin",
+        "email": "account@example.com"
+    },
+    "uri": "http://localhost",
+    "solr_server": {
+        "name": "Apache Solr server",
+        "enabled": 1,
+        "description": "",
+        "scheme": "http",
+        "host": "127.0.0.1",
+        "port": 8080,
+        "path": "/solr/core",
+        "http_user": "",
+        "http_password": "",
+        "excerpt": false,
+        "retrieve_data": false,
+        "highlight_data": false,
+        "skip_schema_check": null,
+        "solr_version": "",
+        "http_method": "AUTO",
+        "apachesolr_read_only": null,
+        "apachesolr_direct_commit": 1,
+        "apachesolr_soft_commit": 1
+    },
+    "variables": {
+        "environment": "production",
+        "site_name": "",
+        "site_mail": "account@example.com",
+        "file_temporary_path": "/tmp",
+        "sa_admin_helper": "0",
+    }
+}

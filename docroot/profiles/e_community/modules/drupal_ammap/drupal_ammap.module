@@ -1,0 +1,255 @@
+<?php
+/**
+ * @file
+ * Code for the Ammap Module.
+ *
+ * @author Dragos Dumitrescu
+ *
+ */
+
+define ('DRUPAL_AMMAP_NAME', 'drupal_ammap');
+
+/**
+ * Implements hook_menu().
+ */
+function drupal_ammap_menu() {
+    $items = array();
+    $items['admin/config/content/drupal_ammap'] = array(
+        'title' => 'AmMap',
+        'description' => 'AmMap config',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('drupal_ammap_form'),
+        'access arguments' => array('access administration pages'),
+        'type' => MENU_NORMAL_ITEM,
+    );
+
+    //Ajax calls with data that needs to be parsed (especially for legend and color assign)
+    $items['drupal_ammap_ajax_parse_data'] = array(
+        'page callback' => 'drupal_ammap_ajax_parse_data',
+        'type' => MENU_CALLBACK,
+        'access arguments' => array('access content'),
+    );
+
+    return $items;
+}
+
+/**
+ * Page callback: CMS AmMap settings
+ *
+ * @see current_posts_menu()
+ */
+function drupal_ammap_form($form, &$form_state) {
+    $form['drupal_ammap_color_default'] = array(
+        '#type' => 'textarea',
+        '#title' => t('Default colors'),
+        '#default_value' => variable_get('drupal_ammap_color_default', "#6A9519, #003871, #C50049, #F5A200, #34B7C4"),
+        '#description' => t('Default colors - comma separated values'),
+        '#required' => TRUE,
+    );
+    $form['drupal_ammap_no_data_text'] = array(
+        '#type' => 'textarea',
+        '#title' => t('No data text'),
+        '#default_value' => variable_get('drupal_ammap_no_data_text', "No data to display"),
+        '#description' => t('No data text'),
+        '#required' => TRUE,
+    );
+    $form['drupal_ammap_mobile_no_map_text'] = array(
+        '#type' => 'textarea',
+        '#title' => t('No data text'),
+        '#default_value' => variable_get('drupal_ammap_mobile_no_map_text', "The map is not available on mobile devices!"),
+        '#description' => t('No data text'),
+        '#required' => TRUE,
+    );
+    return system_settings_form($form);
+}
+
+/**
+ * @param $data
+ * @param array $settings
+ * @param null $legend
+ *
+ * $settings array(
+ *      'color_default' - string color
+ * ,    'legend' - bool - if render the legend or not
+ *      'steps'  - bool  -if add slider
+ *      'ajax_endpoint'  - URL to call to extract data for slider
+*                          -  the ajax will concatenate the value from $steps to this URL
+ * $legend
+ *      array(
+ *          array(  'name'  - string    - Legend title to show - must be the same as in $area['legend']
+ * ,                'color' - string    - color for legend
+ * $legend['default'] legend for no legend areas
+ * $steps  array that contains steps for slider (if settings['steps'] true) - values used in ajax calls
+ *
+ * @return string
+ */
+function drupal_ammap_render_map($data, $settings = array(), $legend = null, $steps = null) {
+
+    if(!isset($settings['drupal_ammap_no_data_text'])) {
+        $settings['drupal_ammap_no_data_text'] = variable_get('drupal_ammap_no_data_text', "No data to display");
+    }
+    $path = drupal_get_path('module', DRUPAL_AMMAP_NAME);
+    if (empty($data)) {
+        return theme_render_template($path . '/drupal_ammap.tpl.php',
+            array(
+                'data' => $data,
+                'no_data_text' => $settings['drupal_ammap_no_data_text'],
+                ));
+    }
+
+    $data_legend = array();
+    drupal_ammap_parse_data($data, $settings, $data_legend);
+
+    drupal_add_js(array('drupal_ammap' => array('ammapData' => $data )), 'setting');
+    drupal_add_js(array('drupal_ammap' => array('settings' => $settings )), 'setting');
+    drupal_add_js(array('drupal_ammap' => array('legend' => $data_legend )), 'setting');
+
+    drupal_add_js(array('drupal_ammap' => array('legend' => $data_legend )), 'setting');
+
+    global $base_url;
+    $ajax_url = $base_url;
+    $ajax_url .= '/drupal_ammap_ajax_parse_data';
+    drupal_add_js(array('drupal_ammap' => array('ajax_url' => $ajax_url )), 'setting');
+
+    if ($steps && isset($settings['steps'])) {
+        drupal_add_js(array('drupal_ammap' => array('steps' => $steps )), 'setting');
+        drupal_add_library('system', 'ui.slider');
+    }
+
+    drupal_add_js("//wurfl.io/wurfl.js", 'external');
+    drupal_add_js("$path/includes/ammap/ammap.js");
+    //drupal_add_js("$path/includes/ammap/worldHigh.js");
+    drupal_add_js("$path/includes/drupal_ammap.js");
+    drupal_add_js(array('drupal_ammap' => array('ammapPath' => '/' . $path . '/includes/ammap')), 'setting');
+
+    $mobile_no_map_text = variable_get('drupal_ammap_mobile_no_map_text', "Sorry, the map is not available on mobile devices.");
+    drupal_add_js(array('drupal_ammap' => array('no_map_text' => t($mobile_no_map_text))), 'setting');
+
+    drupal_add_css("$path/includes/drupal_ammap.css");
+    return theme_render_template($path . '/drupal_ammap.tpl.php',array(
+            'data' => $data,
+            'no_data_text' => $settings['drupal_ammap_no_data_text'],
+        ));
+}
+
+/**
+ * Function to parse data and legend - used by first render and ajax calls
+ *
+ * @param $data
+ * @param $settings
+ * @param $data_legend
+ *
+ * @return bool
+ */
+function drupal_ammap_parse_data(&$data, $settings, &$data_legend) {
+
+    if(!isset($settings['color_default'])) {
+        $settings['color_default'] = variable_get('drupal_ammap_color_default', "#003871, #6A9519, #C50049, #F5A200, #34B7C4");
+    }
+    $default_colors = explode(',', $settings['color_default']);
+
+    $data_legend = array();
+    if (!empty($legend)) {
+        //sort legend by weight and assign colors
+        uasort($legend, 'drupal_ammap_cmp_weight');
+        $data_legend = $legend;
+        foreach ($data_legend as &$lg) {
+            if(empty($lg['color'])) {
+                $lg['color'] = drupal_ammap_get_color($default_colors);
+            }
+        }
+    }
+
+    foreach($data as &$area) {
+        //if legend field exists for area
+        if ( isset($area['legend']) && !empty($area['legend']) ) {
+            if (!isset($data_legend[$area['legend']])) {
+                //construct legend array
+                $legend_entry = array (
+                    'name' => $area['legend'],
+                    'color' => drupal_ammap_get_color($default_colors)
+                );
+                $data_legend[$area['legend']] = $legend_entry;
+            }
+            $area['color'] = $data_legend[$area['legend']]['color'];
+        } else {
+            //if no legend for area, assign it to default
+            if (empty($data_legend['default'])) {
+                $data_legend['default'] = array(
+                    'name'  => t('Other'),
+                    'color' => (!empty($legend['default']['color'])) ? $legend['default']['color'] : drupal_ammap_get_color($default_colors)
+                );
+            }
+            $area['color'] = $data_legend['default']['color'];
+            $settings['show_default_legend'] = true;
+        }
+    }
+
+    if (!isset($settings['show_default_legend']) && !empty($data_legend['default'])) {
+        unset($data_legend['default']);
+    }
+
+    //put default at the end of array
+    if (!empty($data_legend['default'])) {
+        $default = $data_legend['default'];
+        unset($data_legend['default']);
+        $data_legend []= $default;
+    }
+    return true;
+}
+
+/**
+ * Ajax callback for drupal_ammap_ajax_parse_data Menu
+ */
+function drupal_ammap_ajax_parse_data() {
+    $param = json_decode($_POST['ammap_data'], true);
+    $data = array();
+    $data_legend = array();
+    $settings = array();
+    if (is_array($param['data']) && is_array($param['legend']) && is_array($param['settings'])) {
+        $data = $param['data'];
+        $data_legend = $param['legend'];
+        $settings = $param['settings'];
+        drupal_ammap_parse_data($data, $settings, $data_legend);
+    }
+    $result['ammapData'] = $data;
+    $result['legend'] = $data_legend;
+    drupal_json_output($result);
+}
+
+function drupal_ammap_random_color() {
+    $possibilities = array(1, 2, 3, 4, 5, 6, 7, 8, 9, "A", "B", "C", "D", "E", "F" );
+    shuffle($possibilities);
+    $color = "#";
+    for( $i = 1; $i <= 6; $i++){
+        $color .= $possibilities[rand(0,14)];
+    }
+    return $color;
+}
+function drupal_ammap_get_color(&$colors) {
+    if (!empty($colors)) {
+        reset($colors);
+        $curr_key = key($colors);
+        $return = $colors[$curr_key];
+        unset($colors[$curr_key]);
+        return $return;
+    } else {
+        return drupal_ammap_random_color();
+    }
+}
+
+function drupal_ammap_cmp_weight($legend1, $legend2) {
+    if (!isset($legend1['weight']) && !isset($legend2['weight'])) {
+        return 0;
+    } else if (!isset($legend1['weight']) && isset($legend2['weight'])) {
+        return 1;
+    } else if (isset($legend1['weight']) && !isset($legend2['weight'])) {
+        return -1;
+    }
+
+    if ($legend1['weight'] == $legend2['weight']) {
+        return 0;
+    }
+
+    return ($legend1['weight'] < $legend2['weight']) ? -1 : 1;
+}

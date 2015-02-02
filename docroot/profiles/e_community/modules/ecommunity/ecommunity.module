@@ -1,0 +1,1230 @@
+<?php
+
+/**
+* Implements hook_menu().
+*/
+function ecommunity_menu() {
+    //Add NFP profile tab in My Account local task menu
+    return array(
+        //User content tab
+        'user/%user/my-content' => array(
+            'title' => t('Content'),
+            'page callback' => 'ecommunity_my_content',
+            'page arguments' => array(1),
+            'access callback' => array('user_is_logged_in'),
+            'weight' => 1,
+            'type' => MENU_LOCAL_TASK,
+        ),
+        'admin/config/services/family-portals' => array(
+            'title' => 'Family portals URLs',
+            'description' => 'Define the base URL to the CMS family web services endpoints',
+            'position' => 'left', 'weight' => -100,
+            'page callback' => 'drupal_get_form',
+            'page arguments' => array('ecommunity_family_portals_form'),
+            'access arguments' => array('administer site configuration'),
+            'type' => MENU_NORMAL_ITEM,
+        ),
+        'species/profile/%' => array( //to change the species/cms/%
+            'title' => 'Specie Profile',
+            'page callback' => 'ecommunity_species_profile_page_callback',
+            'page arguments' => array(2),
+            'access callback' => TRUE,
+        )
+  );
+}
+
+
+/**
+ * Display the content for species profile page.
+ */
+function ecommunity_species_profile_page_callback($scientific_name) {
+    return '';
+    //return theme('species_profile_page_template'); TODO: update templte for species profile
+}
+
+
+function ecommunity_family_portals_form($form, &$form_state) {
+    $form['cms_instance_url'] = array(
+        '#type' => 'textfield',
+        '#title' => t('CMS website URL'),
+        '#default_value' => variable_get('cms_instance_url', 'http://cms.int'),
+        '#size' => 30, '#required' => TRUE,
+    );
+    $form['aewa_instance_url'] = array(
+        '#type' => 'textfield',
+        '#title' => t('AEWA website URL'),
+        '#default_value' => variable_get('aewa_instance_url', 'http://unep-aewa.org'),
+        '#size' => 30, '#required' => TRUE,
+    );
+    $form['ascobans_instance_url'] = array(
+        '#type' => 'textfield',
+        '#title' => t('ASCOBANS website URL'),
+        '#default_value' => variable_get('ascobans_instance_url', 'http://ascobans.org'),
+        '#size' => 30, '#required' => TRUE,
+    );
+    $form['eurobats_instance_url'] = array(
+        '#type' => 'textfield',
+        '#title' => t('EUROBATS website URL'),
+        '#default_value' => variable_get('eurobats_instance_url', 'http://eurobats.org'),
+        '#size' => 30, '#required' => TRUE,
+    );
+    return system_settings_form($form);
+}
+
+
+/*
+ * Render embedded My Content view will display My Account tabs
+ */
+function ecommunity_my_content($account = NULL){
+    return views_embed_view('my_content', 'default', $account->uid);
+}
+
+
+/**
+ * Implements HOOK_block_info()
+ *
+ * @return array
+ */
+function ecommunity_block_info() {
+    $blocks['species_profile'] = array(
+        'info' => t('Species profile from the family websites'),
+        'region' => 'content',
+        'visibility' => BLOCK_VISIBILITY_LISTED,
+        'pages' => 'species/cms/*',
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['country_profile'] = array(
+        'info' => t('Country profile from the family websites'),
+        'region' => 'content',
+        'visibility' => BLOCK_VISIBILITY_LISTED,
+        'pages' => 'country/*',
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['country_flag'] = array(
+        'info' => t('Country flag - Country profile page'),
+        'region' => 'sidebar_second',
+        'visibility' => BLOCK_VISIBILITY_LISTED,
+        'pages' => 'country/*',
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['ecommunity_block_publications'] = array(
+        'info' => t('Show publications from the family websites'),
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['ecommunity_block_projects'] = array(
+        'info' => t('Show projects from the family websites'),
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['ecommunity_block_wg'] = array(
+        'info' => t('Show working groups from the family websites'),
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['ecommunity_block_awards'] = array(
+        'info' => t('Show awards from the family websites'),
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['ecommunity_block_campaigns'] = array(
+        'info' => t('Show campaigns from the family websites'),
+        'cache' => DRUPAL_NO_CACHE,
+    );
+	$blocks['ecommunity_block_species'] = array(
+        'info' => t('Show species list from the family websites'),
+        'visibility' => BLOCK_VISIBILITY_LISTED,
+        'pages' => 'content/species',
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['ecommunity_block_countries'] = array(
+        'info' => t('Show countries list from the family websites'),
+        'visibility' => BLOCK_VISIBILITY_LISTED,
+        'pages' => 'content/countries',
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['ecommunity_block_news'] = array(
+        'info' => t('Show news list from the family websites'),
+        'visibility' => BLOCK_VISIBILITY_LISTED,
+        'pages' => 'content/news',
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['ecommunity_block_latest_news'] = array(
+        'info' => t('Show the latest news list from the family websites'),
+        'visibility' => BLOCK_VISIBILITY_LISTED,
+        'pages' => 'content/home',
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['ecommunity_block_meetings'] = array(
+        'info' => t('Show upcoming meetings list from the family websites'),
+        'visibility' => BLOCK_VISIBILITY_LISTED,
+        'pages' => 'content/upcoming-meetings',
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['ecommunity_block_up_meetings'] = array(
+        'info' => t('Show upcoming meetings short list from the family websites'),
+        'visibility' => BLOCK_VISIBILITY_LISTED,
+        'pages' => 'content/home',
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    $blocks['ecommunity_meetings_calendar'] = array(
+        'info' => t('Common Portal Meetings Calendar'),
+        'region' => 'content',
+        'visibility' => BLOCK_VISIBILITY_LISTED,
+        'pages' => '<front>',
+        'cache' => DRUPAL_NO_CACHE,
+    );
+    return $blocks;
+}
+
+
+/**
+ * Implements HOOK_block_view()
+ *
+ * @param string $delta Block delta (block identifier)
+ * @return array
+ */
+function ecommunity_block_view($delta = '') {
+    switch($delta) {
+		case 'ecommunity_block_species':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = _ecommunity_block_species_content();
+                return $block;
+            }
+            break;
+        case 'species_profile':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = _ecommunity_species_profile_block_content(arg(2));
+               return $block;
+            }
+            break;
+        case 'ecommunity_block_countries':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = _ecommunity_block_countries_content();
+                return $block;
+            }
+            break;
+        case 'country_profile':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = _ecommunity_country_profile_block_content(arg(1));
+                return $block;
+            }
+            break;
+        case 'country_flag':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = _ecommunity_country_flag_content(arg(1));
+                return $block;
+            }
+            break;
+        case 'ecommunity_block_publications':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = ecommunity_block_publications_content();
+                return $block;
+            }
+            break;
+        case 'ecommunity_block_projects':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = ecommunity_block_projects_content();
+                return $block;
+            }
+            break;
+        case 'ecommunity_block_wg':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = ecommunity_block_wg_content();
+                return $block;
+            }
+            break;
+        case 'ecommunity_block_awards':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = ecommunity_block_awards_content();
+                return $block;
+            }
+            break;
+        case 'ecommunity_block_campaigns':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = ecommunity_block_campaigns_content();
+                return $block;
+            }
+            break;
+        case 'ecommunity_block_news':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = _ecommunity_block_news_content();
+                return $block;
+            }
+            break;
+        case 'ecommunity_block_latest_news':
+            if(user_access('access content')) {
+                $block['subject'] = t('News');
+                $block['content'] = _ecommunity_block_latest_news_content();
+                return $block;
+            }
+            break;
+        case 'ecommunity_block_meetings':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = _ecommunity_block_meetings_content();
+                return $block;
+            }
+            break;
+        case 'ecommunity_block_up_meetings':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = _ecommunity_block_up_meetings_content();
+                return $block;
+            }
+            break;
+        case 'ecommunity_meetings_calendar':
+            if(user_access('access content')) {
+                $block['subject'] = NULL;
+                $block['content'] = _ecommunity_meetings_calendar_block_content();
+                return $block;
+            }
+            break;
+    }
+    return array();
+}
+
+
+/**
+ * Block content for the Meetings Calendar block.
+ *
+ * @return string Rendered HTML string
+ */
+function _ecommunity_meetings_calendar_block_content(){
+    module_load_include('inc', 'ecommunity', 'ecommunity_upcoming_meetings.api');
+    $rows = array();
+
+    $service = new CMSUpcomingMeetingsWS();
+    $filters = $service->get_filters_from_request();
+    $total = $service->get_listing_count($filters);
+    $sort = $service->get_sort_from_request();
+
+    $all_meetings = $service->get_listing($filters, $sort);
+
+    $render['meetings'] = $all_meetings;
+    $render['total'] = $total;
+    $render['content'] = array(
+        '#items' => $rows,
+    );
+
+    return theme('_ecommunity_meetings_calendar_block_content', array('items' => $render));
+}
+
+
+/**
+ * Block content for the countries block - countries list.
+ *
+ * @return string Rendered HTML string
+ */
+function _ecommunity_block_countries_content() {
+    module_load_include('inc', 'ecommunity', 'ecommunity_countries.api');
+    $page_size = 20;
+    $rows = array();
+
+    $service = new CMSCountriesWS();
+    $filters = $service->get_filters_from_request();
+    $total = $service->get_listing_count($filters);
+    $sort = $service->get_sort_from_request();
+    $page = $service->get_page_from_request();
+
+    $all_countries = $service->get_listing($filters, $sort);
+    $countries = $service->paginate_results($all_countries, $page, $page_size);
+
+    $render['countries'] = $countries;
+    $render['total'] = $total;
+    $render['content'] = array(
+        '#items' => $rows,
+    );
+
+    // Pagination
+    $render['pager'] = $service->get_theme_pager($total, $page_size, $filters);
+
+    // Faceted filters
+    $fnav = new CountriesFilters($service, $all_countries);
+    $render['facets'] = $fnav->theme_facets();
+    $render['submit'] = array(
+        '#type' => 'button', '#value' => t('Filter'),
+        '#attributes' => array('type' => 'submit', 'class' => array('btn', 'btn-primary'))
+    );
+    $reset_url = '';
+    $node = menu_get_object();
+    if(!empty($node->nid)) {
+        $reset_url = url('node/' . $node->nid, array('absolute' => TRUE));
+    }
+    $render['reset'] = array(
+        '#title' => t('Reset'), '#type' => 'link', '#href' => $reset_url,
+        '#options' => array('attributes' => array('class' => array('btn', 'btn-default')))
+    );
+
+    //Map
+    $map_data = array();
+    foreach ($all_countries as $country) {
+        //var_dump($country->instrument_status);die();
+        $map_data []= array(
+            'title' => $country->name,
+            'iso2'  => strtoupper($country->iso2),
+            'customData'  => getCustomData($country),
+            //'legend' => $type,
+            'url' => "country/$country->iso2",
+            //'color' => ''
+        );
+    }
+
+    $render['map_data'] = $map_data;
+
+    return theme('_ecommunity_block_countries_content', array('items' => $render));
+}
+
+/*
+ * Process array(instrument=>status) for map customData option
+ * @return string
+ */
+function getCustomData($country){
+    $result = "";
+
+    if (!empty($country->instrument_status)) {
+        foreach ($country->instrument_status as $instrument => $status) {
+            $result .= $instrument." - ".$status."<br/>";
+        }
+    }
+
+    return $result;
+}
+
+/*
+ * Block content for the species block - species list.
+ *
+ * @return string Rendered HTML string
+ */
+function _ecommunity_block_species_content() {
+    module_load_include('inc', 'ecommunity', 'ecommunity_species.api');
+    $page_size = 20;
+    $rows = array();
+
+    $service = new CMSSpeciesWS();
+    $filters = $service->get_filters_from_request();
+    $total = $service->get_listing_count($filters);
+    $sort = 'asc';
+    $page = $service->get_page_from_request();
+
+    $all_species = $service->get_listing($filters, $sort);
+    $species = $service->paginate_results($all_species, $page, $page_size);
+
+    $render['species'] = $species;
+    $render['total'] = $total;
+    $render['content'] = array(
+        '#items' => $rows,
+    );
+
+	// Pagination
+    $render['pager'] = $service->get_theme_pager($total, $page_size, $filters);
+
+	// Faceted filters
+    $fnav = new SpeciesFilters($service, $all_species);
+    $render['facets'] = $fnav->theme_facets();
+    $render['submit'] = array(
+        '#type' => 'button', '#value' => t('Filter'),
+        '#attributes' => array('type' => 'submit', 'class' => array('btn', 'btn-primary'))
+    );
+    $reset_url = '';
+    $node = menu_get_object();
+    if(!empty($node->nid)) {
+        $reset_url = url('node/' . $node->nid, array('absolute' => TRUE));
+    }
+    $render['reset'] = array(
+        '#title' => t('Reset'), '#type' => 'link', '#href' => $reset_url,
+        '#options' => array('attributes' => array('class' => array('btn', 'btn-default')))
+    );
+
+    return theme('_ecommunity_block_species_content', array('items' => $render));
+}
+
+
+/**
+ * Block content for the country flag block.
+ *
+ * @return string Rendered HTML string
+ */
+function _ecommunity_country_flag_content($iso2) {
+    $img_name = strtoupper($iso2);
+    $theme_path = drupal_get_path('theme', 'cms_ecommunity_theme');
+
+    $block['content'] = array(
+        '#theme' => 'image_formatter',
+        '#item' => array(
+            'uri' => "$theme_path/images/iso2_flags/$img_name.gif",
+            'alt' => "$img_name",
+        ),
+    );
+
+    return theme('_ecommunity_country_flag_content', array('item' => $block));
+}
+
+
+/**
+ * Create content for the block
+ */
+function _ecommunity_country_profile_block_content($iso2){
+    module_load_include('inc', 'ecommunity', 'ecommunity_countries.api');
+
+    $service = new CMSCountriesWS();
+    $cms_base_url = $service->get_instance_url('cms', '');
+	$aewa_base_url = $service->get_instance_url('aewa', '');
+	$ascobans_base_url = $service->get_instance_url('ascobans', '');
+	$eurobats_base_url = $service->get_instance_url('eurobats', '');
+
+	$cms_content = _ecommunity_prepare_country_panel_content($cms_base_url, $iso2);
+	$aewa_content = _ecommunity_prepare_country_panel_content($aewa_base_url, $iso2);
+	$ascobans_content = _ecommunity_prepare_country_panel_content($ascobans_base_url, $iso2);
+	$eurobats_content = _ecommunity_prepare_country_panel_content($eurobats_base_url, $iso2);
+
+    $tabs_content = array();
+	if ($cms_content != null) {
+		$tabs_content['cms'] = $cms_content;
+	}
+
+	if ($aewa_content != null) {
+		$tabs_content['aewa'] = $aewa_content;
+	}
+
+	if ($ascobans_content != null) {
+		$tabs_content['ascobans'] = $ascobans_content;
+	}
+
+	if ($eurobats_content != null) {
+		$tabs_content['eurobats'] = $eurobats_content;
+	}
+
+	$tabs = $tabs_content != NULL ? array_keys($tabs_content) : array();
+
+	return theme('_ecommunity_country_profile_block_content', array(
+      'tabs' => $tabs,
+      'tabs_content' => $tabs_content,
+    )
+  );
+}
+
+
+/**
+ * Create content for the block
+ */
+function _ecommunity_species_profile_block_content($scientific_name){
+	module_load_include('inc', 'ecommunity', 'ecommunity_species.api');
+
+    $service = new CMSSpeciesWS();
+    $cms_base_url = $service->get_instance_url('cms', '');
+    $aewa_base_url = $service->get_instance_url('aewa', '');
+    $ascobans_base_url = $service->get_instance_url('ascobans', '');
+    $eurobats_base_url = $service->get_instance_url('eurobats', '');
+
+	$cms_content = _ecommunity_prepare_specie_panel_content($cms_base_url, $scientific_name);
+	$aewa_content = _ecommunity_prepare_specie_panel_content($aewa_base_url, $scientific_name);
+	$ascobans_content = _ecommunity_prepare_specie_panel_content($ascobans_base_url, $scientific_name);
+	$eurobats_content = _ecommunity_prepare_specie_panel_content($eurobats_base_url, $scientific_name);
+
+    $tabs_content = array();
+	if ($cms_content != null) {
+		$tabs_content['cms'] = $cms_content;
+	}
+
+	if ($aewa_content != null) {
+		$tabs_content['aewa'] = $aewa_content;
+	}
+
+	if ($ascobans_content != null) {
+		$tabs_content['ascobans'] = $ascobans_content;
+	}
+
+	if ($eurobats_content != null) {
+		$tabs_content['eurobats'] = $eurobats_content;
+	}
+
+	$tabs = $tabs_content != NULL ? array_keys($tabs_content) : array();
+	return theme('_ecommunity_species_profile_block_content', array(
+      'tabs' => $tabs,
+      'tabs_content' => $tabs_content,
+    )
+  );
+}
+
+/**
+ * Preapare content for tab panels - country profile
+ */
+function _ecommunity_prepare_country_panel_content($base_url, $iso2) {
+    $get_country_result = _ecommunity_get_country($base_url, $iso2);
+    $tab = _get_instance_name($base_url);
+    $rows = array();
+
+    if ($get_country_result->code == 200) {
+        $data = json_decode($get_country_result->data);
+        if ($data) {
+            $rows[] = array(
+                'official_name' => isset($data[0]->official_name) ? $data[0]->official_name : NULL,
+                'url' => isset($data[0]->url) ? $data[0]->url : NULL,
+                'entry_into_force' => isset($data[0]->entry_into_force) ? $data[0]->entry_into_force : NULL,
+                'date_amendment' => isset($data[0]->date_amendment) ? $data[0]->date_amendment : NULL,
+                'date_accession' => isset($data[0]->date_accession) ? $data[0]->date_accession : NULL,
+                'region' => isset($data[0]->region) ? $data[0]->region : NULL,
+              /*
+                'ratification_statuses' => "TODO LIST";//get ratif statuses
+                'anual_contribution' => $data[0]->anual_contribution,
+                'voluntary_contribution' => $data[0]->voluntary_contribution,
+                'arrears_contribution' => $data[0]->arrears_contribution,
+                */
+            );
+            return $rows;
+        } else {
+            return 	null;
+        }
+    } else {
+        drupal_set_message(t('Unable to get service data from @instance', array('@instance' => strtoupper($tab))), 'error');
+        return null;
+    }
+}
+
+/**
+ * Preapare content for tab panels - specie profile
+ */
+function _ecommunity_prepare_specie_panel_content($base_url, $slug) {
+    module_load_include('inc', 'ecommunity', 'ecommunity_species.api');
+    $service = new CMSSpeciesWS();
+    $scientific_name = $service->get_scientific_name_by_slug($slug);
+    if(empty($scientific_name)) {
+        return NULL;
+    }
+    $get_specie_result = _ecommunity_get_specie($base_url, $scientific_name);
+    $tab = _get_instance_name($base_url);
+    $rows = array();
+    if ($get_specie_result->code == 200) {
+        $data = json_decode($get_specie_result->data);
+        if ($data) {
+            $rows[] = array(
+                'range_states' => _ecommunity_get_range_states_list(isset($data[0]->geographic_range->range_states) ? $data[0]->geographic_range->range_states : NULL),
+                'geographic_notes' => isset($data[0]->geographic_range->notes) ? $data[0]->geographic_range->notes : NULL,
+                'critical_sites' => isset($data[0]->critical_sites) ? $data[0]->critical_sites : NULL,
+                'notes' => isset($data[0]->notes) ? $data[0]->notes : NULL,
+            );
+            return $rows;
+        } else {
+            return NULL;
+        }
+    } else {
+        drupal_set_message(t('Unable to get service data from @instance', array('@instance' => strtoupper($tab))), 'error');
+        return NULL;
+    }
+}
+
+
+function _ecommunity_get_range_states_list($range_states) {
+    $result = NULL;
+
+    if ($range_states == NULL) {
+        return $result;
+    }
+
+    foreach($range_states as $state) {
+        $result .= $state->range_state->name.', ';
+    }
+
+    return substr($result, 0, -2);
+}
+
+
+/**
+ * Retrive specie details with http GET method
+ */
+function _ecommunity_get_specie($base_url, $scientific_name) {
+    $parameters = '/ws/species_node?scientific_name='.rawurlencode($scientific_name);
+    $url = $base_url . $parameters;
+    $headers = array(
+        'Accept' => 'application/json',
+    );
+
+    $options = array(
+        'headers' => $headers,
+        'method' => 'GET',
+        'max_redirects' => 0,
+        'timeout' => 60,
+    );
+    return drupal_http_request($url, $options);
+}
+
+
+/**
+ * Retrive country details with http GET method
+ */
+
+function _ecommunity_get_country($base_url, $iso2) {
+    $parameters = '/ws/country?iso2='.$iso2;
+    $url = $base_url.$parameters;
+    $headers = array(
+        'Accept' => 'application/json',
+    );
+
+    $options = array(
+        'headers' => $headers,
+        'method' => 'GET',
+        'max_redirects' => 0,
+        'timeout' => 60,
+    );
+
+    return drupal_http_request($url, $options);
+}
+
+
+/**
+ * Return instance of url TODO : refactor
+ */
+function _get_instance_name($url) {
+    $instance_url = strtolower($url);
+
+    $result = 'cms';
+
+    if (strpos($url, 'cms.') !== false) {
+        $result = 'cms';
+    }
+    if (strpos($url, 'aewa.') !== false) {
+        $result = 'aewa';
+    }
+    if (strpos($url, 'ascobans.') !== false) {
+        $result = 'ascobans';
+    }
+    if (strpos($url, 'eurobats.') !== false) {
+        $result = 'eurobats';
+    }
+
+    return $result;
+}
+
+
+/*
+ * Block content for the publications block.
+ *
+ * @return string Rendered HTML string
+ */
+function ecommunity_block_publications_content() {
+    module_load_include('inc', 'ecommunity', 'ecommunity_publications.api');
+    $page_size = 10; $rows = array();
+
+    $service = new CMSPublicationsWS();
+    $filters = $service->get_filters_from_request();
+    $total = $service->get_listing_count($filters);
+    $sort = $service->get_sort_from_request();
+    $page = $service->get_page_from_request();
+
+    $all_publications = $service->get_listing($filters, $sort);
+    $publications = $service->paginate_results($all_publications, $page, $page_size);
+
+    $render['publications'] = $publications;
+    $render['total'] = $total;
+    $render['content'] = array(
+        '#theme' => 'item_list', '#type' => 'ul',
+        '#items' => $rows,
+    );
+    // Pagination
+    $render['pager'] = $service->get_theme_pager($total, $page_size, $filters);
+    // Faceted filters
+    $fnav = new PublicationsFilters($service, $all_publications);
+    $render['facets'] = $fnav->theme_facets();
+    $render['submit'] = array(
+        '#type' => 'button', '#value' => t('Filter'),
+        '#attributes' => array('type' => 'submit', 'class' => array('btn', 'btn-primary'))
+    );
+    $reset_url = '';
+    $node = menu_get_object();
+    if(!empty($node->nid)) {
+        $reset_url = url('node/' . $node->nid, array('absolute' => TRUE));
+    }
+    $render['reset'] = array(
+        '#title' => t('Reset'), '#type' => 'link', '#href' => $reset_url,
+        '#options' => array('attributes' => array('class' => array('btn', 'btn-default')))
+    );
+
+    return theme('ecommunity_block_publications_content', array('items' => $render));
+}
+
+
+/*
+ * Block content for the news block.
+ *
+ * @return string Rendered HTML string
+ */
+function _ecommunity_block_news_content() {
+    module_load_include('inc', 'ecommunity', 'ecommunity_news.api');
+    $page_size = 20;
+    $rows = array();
+
+    $service = new CMSNewsWS();
+    $filters = $service->get_filters_from_request();
+    $total = $service->get_listing_count($filters);
+    $sort = $service->get_sort_from_request();
+    $page = $service->get_page_from_request();
+
+    $all_news = $service->get_listing($filters, $sort);
+    $news = $service->paginate_results($all_news, $page, $page_size);
+
+    $render['news'] = $news;
+    $render['total'] = $total;
+    $render['content'] = array(
+        '#theme' => 'item_list',
+        '#type' => 'ul',
+        '#items' => $rows,
+    );
+
+    // Pagination
+    $render['pager'] = $service->get_theme_pager($total, $page_size, $filters);
+
+    // Faceted filters
+    $fnav = new NewsFilters($service, $all_news);
+    $render['facets'] = $fnav->theme_facets();
+    $render['submit'] = array(
+        '#type' => 'button', '#value' => t('Filter'),
+        '#attributes' => array('type' => 'submit', 'class' => array('btn', 'btn-primary'))
+    );
+    $reset_url = '';
+    $node = menu_get_object();
+    if(!empty($node->nid)) {
+        $reset_url = url('node/' . $node->nid, array('absolute' => TRUE));
+    }
+    $render['reset'] = array(
+        '#title' => t('Reset'), '#type' => 'link', '#href' => $reset_url,
+        '#options' => array('attributes' => array('class' => array('btn', 'btn-default')))
+    );
+
+    return theme('_ecommunity_block_news_content', array('items' => $render));
+}
+
+/*
+ * Block content for the latest news block.
+ *
+ * @return string Rendered HTML string
+ */
+function _ecommunity_block_latest_news_content() {
+    module_load_include('inc', 'ecommunity', 'ecommunity_latest_news.api');
+    $page_size = 10;
+    $rows = array();
+
+    $service = new CMSLatestNewsWS();
+    $filters = $service->get_filters_from_request();
+    $total = $service->get_listing_count($filters);
+    $sort = $service->get_sort_from_request();
+    $page = $service->get_page_from_request();
+
+    $all_news = $service->get_listing($filters, $sort);
+    $news = $service->paginate_results($all_news, $page, $page_size);
+
+    $render['news'] = $news;
+    $render['total'] = $total;
+    $render['content'] = array(
+        '#theme' => 'item_list',
+        '#type' => 'ul',
+        '#items' => $rows,
+    );
+    return theme('_ecommunity_block_latest_news_content', array('items' => $render));
+}
+
+
+/*
+ * Block content for the upcoming meetings (all) block.
+ *
+ * @return string Rendered HTML string
+ */
+function _ecommunity_block_meetings_content() {
+    module_load_include('inc', 'ecommunity', 'ecommunity_upcoming_meetings.api');
+    $page_size = 20;
+    $rows = array();
+
+    $service = new CMSUpcomingMeetingsWS();
+    $filters = $service->get_filters_from_request();
+    $total = $service->get_listing_count($filters);
+    $sort = $service->get_sort_from_request();
+    $page = $service->get_page_from_request();
+
+    $all_meetings = $service->get_listing($filters, $sort);
+    $meetings = $service->paginate_results($all_meetings, $page, $page_size);
+
+    $render['meetings'] = $meetings;
+    $render['total'] = $total;
+    $render['content'] = array(
+        '#theme' => 'item_list',
+        '#type' => 'ul',
+        '#items' => $rows,
+    );
+
+    // Pagination
+    $render['pager'] = $service->get_theme_pager($total, $page_size, $filters);
+
+    // Faceted filters
+    $fnav = new UpcomingMeetingsFilters($service, $all_meetings);
+    $render['facets'] = $fnav->theme_facets();
+    $render['submit'] = array(
+        '#type' => 'button', '#value' => t('Filter'),
+        '#attributes' => array('type' => 'submit', 'class' => array('btn', 'btn-primary'))
+    );
+    $reset_url = '';
+    $node = menu_get_object();
+    if(!empty($node->nid)) {
+        $reset_url = url('node/' . $node->nid, array('absolute' => TRUE));
+    }
+    $render['reset'] = array(
+        '#title' => t('Reset'), '#type' => 'link', '#href' => $reset_url,
+        '#options' => array('attributes' => array('class' => array('btn', 'btn-default')))
+    );
+
+    return theme('_ecommunity_block_meetings_content', array('items' => $render));
+}
+
+
+/*
+ * Block content for the upcoming meetings (short list - tab on home page) block.
+ *
+ * @return string Rendered HTML string
+ */
+function _ecommunity_block_up_meetings_content() {
+    module_load_include('inc', 'ecommunity', 'ecommunity_upcoming_meetings.api');
+    $page_size = 10;
+    $rows = array();
+
+    $service = new CMSUpcomingMeetingsWS();
+    $filters = $service->get_filters_from_request();
+    $total = $service->get_listing_count($filters);
+    $sort = $service->get_sort_from_request();
+    $page = $service->get_page_from_request();
+
+    $all_meetings = $service->get_listing($filters, $sort);
+    $result = array_slice($all_meetings, 0, 5);
+    $meetings = $service->paginate_results($result, $page, $page_size);
+
+    $render['meetings'] = $meetings;
+    $render['total'] = $total;
+    $render['content'] = array(
+        '#theme' => 'item_list',
+        '#type' => 'ul',
+        '#items' => $rows,
+    );
+
+    return theme('_ecommunity_block_up_meetings_content', array('items' => $render));
+}
+
+
+/*
+ * Block content for the projects block.
+ *
+ * @return string Rendered HTML string
+ */
+function ecommunity_block_projects_content() {
+    module_load_include('inc', 'ecommunity', 'ecommunity_projects.api');
+    $page_size = 10;
+
+    $service = new CMSProjectsWS();
+    $filters = $service->get_filters_from_request();
+    $sort = $service->get_sort_from_request();
+    $page = $service->get_page_from_request();
+    $total = $service->get_listing_count($filters);
+
+    $all_rows = $service->get_listing($filters, $sort);
+    $rows = $service->paginate_results($all_rows, $page, $page_size);
+
+    $render['rows'] = $rows;
+    $render['total'] = $total;
+    $render['content'] = array(
+        '#theme' => 'item_list', '#type' => 'ul',
+        '#items' => $rows,
+    );
+    // Pagination
+    $render['pager'] = $service->get_theme_pager($total, $page_size, $filters);
+    // Faceted filters
+    $fnav = new ProjectsFilters($service, $all_rows);
+    $render['facets'] = $fnav->theme_facets();
+    $render['submit'] = array(
+        '#type' => 'button', '#value' => t('Filter'),
+        '#attributes' => array('type' => 'submit', 'class' => array('btn', 'btn-primary'))
+    );
+    $reset_url = '';
+    $node = menu_get_object();
+    if(!empty($node->nid)) {
+        $reset_url = url('node/' . $node->nid, array('absolute' => TRUE));
+    }
+    $render['reset'] = array(
+        '#title' => t('Reset'), '#type' => 'link', '#href' => $reset_url,
+        '#options' => array('attributes' => array('class' => array('btn', 'btn-default')))
+    );
+
+    return theme('ecommunity_block_projects_content', array('items' => $render));
+}
+
+
+/*
+ * Block content for the working groups block.
+ *
+ * @return string Rendered HTML string
+ */
+function ecommunity_block_wg_content() {
+    module_load_include('inc', 'ecommunity', 'ecommunity_wg.api');
+    $page_size = 10;
+
+    $service = new CMSWorkingGroupWS();
+    $filters = $service->get_filters_from_request();
+    $sort = $service->get_sort_from_request();
+    $page = $service->get_page_from_request();
+    $total = $service->get_listing_count($filters);
+
+    $all_rows = $service->get_listing($filters, $sort);
+    $rows = $service->paginate_results($all_rows, $page, $page_size);
+
+    $render['rows'] = $rows;
+    $render['total'] = $total;
+    $render['content'] = array(
+        '#theme' => 'item_list', '#type' => 'ul',
+        '#items' => $rows,
+    );
+    // Pagination
+    $render['pager'] = $service->get_theme_pager($total, $page_size, $filters);
+    // Faceted filters
+    $fnav = new WorkingGroupFilters($service, $all_rows);
+    $render['facets'] = $fnav->theme_facets();
+    $render['submit'] = array(
+        '#type' => 'button', '#value' => t('Filter'),
+        '#attributes' => array('type' => 'submit', 'class' => array('btn', 'btn-primary'))
+    );
+    $reset_url = '';
+    $node = menu_get_object();
+    if(!empty($node->nid)) {
+        $reset_url = url('node/' . $node->nid, array('absolute' => TRUE));
+    }
+    $render['reset'] = array(
+        '#title' => t('Reset'), '#type' => 'link', '#href' => $reset_url,
+        '#options' => array('attributes' => array('class' => array('btn', 'btn-default')))
+    );
+
+    return theme('ecommunity_block_wg_content', array('items' => $render));
+}
+
+
+/*
+ * Block content for the working groups block.
+ *
+ * @return string Rendered HTML string
+ */
+function ecommunity_block_awards_content() {
+    module_load_include('inc', 'ecommunity', 'ecommunity_awards.api');
+    $page_size = 10;
+
+    $service = new CMSAwardsWS();
+    $filters = $service->get_filters_from_request();
+    $sort = $service->get_sort_from_request();
+    $page = $service->get_page_from_request();
+    $total = $service->get_listing_count($filters);
+
+    $all_rows = $service->get_listing($filters, $sort);
+    $rows = $service->paginate_results($all_rows, $page, $page_size);
+
+    $render['rows'] = $rows;
+    $render['total'] = $total;
+    $render['content'] = array(
+        '#theme' => 'item_list', '#type' => 'ul',
+        '#items' => $rows,
+    );
+    // Pagination
+    $render['pager'] = $service->get_theme_pager($total, $page_size, $filters);
+    // Faceted filters
+    $fnav = new AwardsFilters($service, $all_rows);
+    $render['facets'] = $fnav->theme_facets();
+    $render['submit'] = array(
+        '#type' => 'button', '#value' => t('Filter'),
+        '#attributes' => array('type' => 'submit', 'class' => array('btn', 'btn-primary'))
+    );
+    $reset_url = '';
+    $node = menu_get_object();
+    if(!empty($node->nid)) {
+        $reset_url = url('node/' . $node->nid, array('absolute' => TRUE));
+    }
+    $render['reset'] = array(
+        '#title' => t('Reset'), '#type' => 'link', '#href' => $reset_url,
+        '#options' => array('attributes' => array('class' => array('btn', 'btn-default')))
+    );
+
+    return theme('ecommunity_block_awards_content', array('items' => $render));
+}
+
+
+/*
+ * Block content for the working groups block.
+ *
+ * @return string Rendered HTML string
+ */
+function ecommunity_block_campaigns_content() {
+    module_load_include('inc', 'ecommunity', 'ecommunity_campaigns.api');
+    $page_size = 10;
+
+    $service = new CMSCampaignsWS();
+    $filters = $service->get_filters_from_request();
+    $sort = $service->get_sort_from_request();
+    $page = $service->get_page_from_request();
+    $total = $service->get_listing_count($filters);
+
+    $all_rows = $service->get_listing($filters, $sort);
+    $rows = $service->paginate_results($all_rows, $page, $page_size);
+
+    $render['rows'] = $rows;
+    $render['total'] = $total;
+    $render['content'] = array(
+        '#theme' => 'item_list', '#type' => 'ul',
+        '#items' => $rows,
+    );
+    // Pagination
+    $render['pager'] = $service->get_theme_pager($total, $page_size, $filters);
+    // Faceted filters
+    $fnav = new CampaignsFilters($service, $all_rows);
+    $render['facets'] = $fnav->theme_facets();
+    $render['submit'] = array(
+        '#type' => 'button', '#value' => t('Filter'),
+        '#attributes' => array('type' => 'submit', 'class' => array('btn', 'btn-primary'))
+    );
+    $reset_url = '';
+    $node = menu_get_object();
+    if(!empty($node->nid)) {
+        $reset_url = url('node/' . $node->nid, array('absolute' => TRUE));
+    }
+    $render['reset'] = array(
+        '#title' => t('Reset'), '#type' => 'link', '#href' => $reset_url,
+        '#options' => array('attributes' => array('class' => array('btn', 'btn-default')))
+    );
+
+    return theme('ecommunity_block_campaigns_content', array('items' => $render));
+}
+
+
+function ecommunity_theme() {
+    $base = array(
+        'path' => drupal_get_path('module', 'ecommunity') . '/templates',
+    );
+    return array(
+        'ecommunity_block_publications_content' => $base + array(
+                'template' => 'publications_block',
+                'variables' => array('items' =>  NULL),
+            ),
+        'ecommunity_block_projects_content' => $base + array(
+            'template' => 'projects_block',
+            'variables' => array('items' =>  NULL),
+        ),
+        'ecommunity_block_wg_content' => $base + array(
+            'template' => 'wg_block',
+            'variables' => array('items' =>  NULL),
+        ),
+        'ecommunity_block_awards_content' => $base + array(
+            'template' => 'awards_block',
+            'variables' => array('items' =>  NULL),
+        ),
+        'ecommunity_block_campaigns_content' => $base + array(
+            'template' => 'campaigns_block',
+            'variables' => array('items' =>  NULL),
+        ),
+        '_ecommunity_species_profile_block_content' => $base + array(
+                'template' => 'block--block--species_profile',
+                'variables' => array(
+                    'tabs' => NULL,
+                    'tabs_content' => NULL,
+                ),
+        ),
+        '_ecommunity_country_profile_block_content' => $base + array(
+                'template' => 'block--block--country_profile',
+                'variables' => array(
+                    'tabs' => NULL,
+                    'tabs_content' => NULL,
+                ),
+        ),
+        '_ecommunity_country_flag_content' => $base + array(
+                'template' => 'block--block--country_flag',
+                'variables' => array(
+                    'item' => NULL,
+                ),
+        ),
+		'_ecommunity_block_species_content' => $base + array(
+                'template' => 'species_block',
+                'variables' => array('items' =>  NULL),
+        ),
+        '_ecommunity_block_countries_content' => $base + array(
+                'template' => 'countries_block',
+                'variables' => array('items' =>  NULL),
+        ),
+        '_ecommunity_block_news_content' => $base + array(
+                'template' => 'news_block',
+                'variables' => array('items' =>  NULL),
+        ),
+        '_ecommunity_block_latest_news_content' => $base + array(
+                'template' => 'latest_news_block',
+                'variables' => array('items' =>  NULL),
+        ),
+        '_ecommunity_block_meetings_content' => $base + array(
+                'template' => 'meetings_block',
+                'variables' => array('items' =>  NULL),
+        ),
+        '_ecommunity_block_up_meetings_content' => $base + array(
+                'template' => 'upcoming_meetings_block',
+                'variables' => array('items' =>  NULL),
+        ),
+        '_ecommunity_meetings_calendar_block_content' => $base + array(
+            'template' => 'meetings_calendar',
+            'variables' => array('items' =>  NULL),
+        ),
+       /*
+        'species_profile_page_template' => array(
+            'template' => 'page--full-width',
+        ),*/
+    );
+}
+
+
+/**
+ * @param SolrBaseQuery $query Solr Query
+ */
+function ecommunity_apachesolr_query_prepare(&$query) {
+    #$query->addParam('shards', implode(',',
+    #    array(
+    #        'localhost:8080/solr/cms',
+    #        'localhost:8080/solr/aewa',
+    #        'localhost:8080/solr/ascobans',
+    #        'localhost:8080/solr/eurobats'
+    #    ))
+    #);
+}
+
+function ecommunity_apachesolr_process_results(&$results, DrupalSolrQueryInterface $query) {
+  foreach ($results as &$result) {
+    $result['link'] = $result['fields']['url'];
+  }
+}
+
+function _ecommunity_documents_types_options() {
+  module_load_include('inc', 'ecommunity', 'ecommunity_documents_types.api');
+  $page_size = 100;
+
+  $service = new CMSDocumentsTypesWS();
+
+  $listing = $service->get_listing($service->get_filters_from_request(), $service->get_sort_from_request());
+  $documents_types = $service->paginate_results($listing, $service->get_page_from_request(), $page_size);
+
+  $options = array(
+    '' => t('All')
+  );
+
+  foreach (array_unique($documents_types) as $document_type)
+    $options['"' . $document_type . '"'] = $document_type;
+
+  return $options;
+}
+
+function ecommunity_form_views_exposed_form_alter(&$form, $form_state, $form_id) {
+  if ($form['#id'] == 'views-exposed-form-documents-page') {
+    $form['sm_vid_Document_type_vocabulary']['#type'] = 'select';
+    $form['sm_vid_Document_type_vocabulary']['#options'] = _ecommunity_documents_types_options();
+  }
+}

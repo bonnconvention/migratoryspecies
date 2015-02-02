@@ -1,0 +1,17 @@
+config-community-test-hotfix-branch.json
+e_community_config.json
+fabfile.pyc
+.pydevproject
+.buildpath
+.project
+.settings
+local.json
+local.ldap.config.json
+/nbproject
+import.sh
+reinstall.sh
+test.sh
+development_update.sh
+local_clone.sh
+production_update.sh
+remote.json

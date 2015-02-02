@@ -1,0 +1,318 @@
+/* FIXES for Internet Explorer 8 */
+
+/* IE8 does not support HTML5 and media queries,
+so the interface will be UNresponsive
+and optimised for 1024x768px */
+
+
+/* HEADER */
+.container {
+max-width: 970px;
+}
+
+.container .col-md-4 {
+width: 323px;
+}
+
+.container .col-md-5 {
+width: 404px;
+}
+
+.container .col-md-7 {
+width: 566px;
+}
+
+.container .col-md-8 {
+width: 647px;
+}
+
+.site-identity,
+.subscribe-social .col-md-4,
+.disclaimers .col-md-8 {
+float: left;
+}
+
+.top-right-header,
+.disclaimers .col-md-4 {
+float: right;
+}
+
+.global-menu.menu.nav.navbar-nav {
+margin: 0;
+}
+
+.global-menu.menu.nav.navbar-nav li {
+display: inline-block;
+}
+
+.global-menu.menu.nav.navbar-nav h2 {
+display: inline-block;
+margin-top: 15px;
+}
+
+.submenu .navbar-header,
+button.navbar-toggle {  /* hide button for Bootstrap collapsable menu */
+display: none;
+}
+
+.region-secondary-menu {
+width: 986px;
+}
+
+.down-area {
+margin-left: 14px;
+}
+
+.search-area-and-logos .region-header {
+margin-top: 5px;
+}
+
+
+/* CENTER COLUMN */
+.center-column.col-md-8,
+.region-content .col-md-8 {
+float: left;
+}
+
+
+/* RIGHT COLUMN */
+.right-column.col-md-4,
+.region-content .col-md-4 {
+float: right;
+}
+
+.well.region-sidebar-second {
+width: 323px;
+margin-right: -15px;
+}
+
+.region-sidebar-second {
+width: 275px;
+}
+
+
+/* Introduction page E-community */
+.center-column.col-md-9 {
+width: 728px;
+float: left;
+}
+
+.center-column.col-md-6 {
+width: 485px;
+float: left;
+}
+
+.region-sidebar-first.well {
+width: 213px;
+}
+
+.region-sidebar-first {
+float: left;
+}
+
+.region-sidebar-second {
+float: right;
+}
+
+.panel {
+padding: 5px;
+}
+
+
+/* Article page content */
+.rating {
+display: inline-block;
+width: 20%;
+}
+
+.node-practice-example .col-md-8,
+.node-nfp-manual .col-md-8,
+.node-community-checklist .col-md-8,
+.node-funding-programme .col-md-8,
+.node-event-calendar .col-md-8 {
+width: 485px;
+}
+
+.node-practice-example .col-md-4,
+.node-nfp-manual .col-md-4,
+.node-community-checklist .col-md-4,
+.node-funding-programme .col-md-4,
+.node-event-calendar .col-md-4 {
+width: 243px;
+}
+
+
+/* Filters */
+ul.no-padding {
+list-style-type: none;
+}
+
+.chapter {
+font-weight: bold;
+}
+
+.generic-pagination .col-md-3 {
+width: 179px;
+}
+
+.generic-pagination .col-md-6 {
+width: 358px;
+float: right;
+}
+
+.total-items {
+float: left;
+}
+
+.view-documents .form-control.form-text {
+min-width: 200px;
+}
+
+.view-documents .view-filters {
+width: 323px;
+left: 650px;
+}
+
+
+/* Training Events,
+    Funding Programmes,
+    Practical Examples */
+.views-exposed-widget.col-md-12 {
+width: 688px;
+}
+
+.views-exposed-widget.col-md-8 {
+width: 458px;
+}
+
+.views-exposed-form .col-md-4 {
+width: 229px;
+float: left;
+margin-top: 0px;
+}
+
+.node-event-calendar .article-body .field,
+.node-funding-programme .article-body .field {
+-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#FFEED2, endColorstr=#FFFFFF, gradientType='1')";
+}
+
+.node-event-calendar .article-body .field-name-body,
+.node-funding-programme .article-body .field-name-body,
+.node-funding-programme .article-body .field-name-field-prog-eligibility-funding,
+.node-funding-programme .article-body .field.field-name-field-fund-prog-image {
+-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#FFFFFF, endColorstr=#FFFFFF)";
+}
+
+#funding-programmes-filters .form-type-textfield,
+#training-events-filters .form-type-textfield {
+width: 300px;
+}
+
+#funding-programmes-filters .search-button {
+width: 100%;
+text-align: center;
+}
+
+#training-events-filters .search-button {
+margin-left: 210px;
+}
+
+.view-practice-examples .col-md-3.views-exposed-widget {
+width: 172px;
+}
+
+.view-practice-examples .search-button.form-group {
+margin-top: 0px;
+}
+
+.view-practice-examples .view-filters {
+position: relative;
+}
+
+.view-practice-examples .view-filters .search-button {
+position: absolute;
+bottom: 20px;
+right: 0px;
+}
+
+
+/* COMMENTS */
+.comment {
+width: 698px;
+}
+
+.indented .comment {
+width: 673px;
+}
+
+.indented .indented .comment {
+width: 648px;
+}
+
+.indented .indented .indented .comment {
+width: 623px;
+}
+
+.comment .attribution.col-md-2 {
+width: 16.618%;
+}
+
+.comment .comment-text.col-md-10 {
+width: 83.381%;
+}
+
+
+/* CHANGES for integrating the old header */
+.small-logos {
+padding-right: 4px;
+margin-top: -37px;
+text-align: right;
+}
+
+.ecomm {
+vertical-align: bottom;
+}
+
+.global-menu {
+width: 986px;
+padding-left: 0;
+}
+
+.navbar-nav.nav.menu.global-menu h2 {
+margin-top: 10px;
+}
+
+.navbar-collapse:before,
+.navbar-collapse:after,
+.container:before,
+.container-after,
+.nav:before,
+.nav:after,
+.collapse {
+display: block;
+}
+
+.navbar-collapse {
+border: 0;
+}
+
+
+/* Register page,
+    Members page,
+    admin toolbar */
+.user-info-from-cookie .chosen-container {
+background: #FFEED2;
+}
+
+#views-exposed-form-members-page .chosen-container {
+background: #F5F5F5;
+}
+
+.page-members .view-filters select,
+.page-members .view-filters .form-text {
+min-width: 170px;
+}
+
+#toolbar {
+filter: progid:DXImageTransform.Microsoft.Shadow(color=#333333, direction='180', strength='5');
+}

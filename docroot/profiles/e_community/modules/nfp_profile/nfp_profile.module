@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the NFP Profile feature.
+ */
+
+include_once 'nfp_profile.features.inc';

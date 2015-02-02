@@ -1,0 +1,1028 @@
+<?php
+!function_exists('profiler_v2') ?
+    require_once('libraries/profiler/profiler.inc') : FALSE;
+profiler_v2('e_community');
+
+/**
+ * Implements hook_install().
+ * Perform actions to set up the site for this profile.
+ */
+function e_community_install() {
+    /* Theme management */
+    // disable all
+    db_update('system')->fields(array('status' => 0))
+        ->condition('type', 'theme')->execute();
+    // enable $default_theme
+    $default_theme = 'cms_ecommunity_theme';
+    db_update('system')->fields(array('status' => 1))
+        ->condition('type', 'theme')
+        ->condition('name', $default_theme)
+        ->execute();
+    variable_set('theme_default', $default_theme);
+    // enable $admin_theme
+    $admin_theme = 'seven';
+    db_update('system')->fields(array('status' => 1))
+        ->condition('type', 'theme')
+        ->condition('name', $admin_theme)
+        ->execute();
+    variable_set('admin_theme', $admin_theme);
+    // activate admin theme when editing a node
+    variable_set('node_admin_theme', '1');
+
+    // Add text formats.
+    $filtered_html_format = array(
+        'format' => 'filtered_html',
+        'name' => 'Filtered HTML',
+        'weight' => 0,
+        'filters' => array(
+            // URL filter.
+            'filter_url' => array('weight' => 0, 'status' => 1,),
+            // HTML filter.
+            'filter_html' => array('weight' => 1,'status' => 1,),
+            // Line break filter.
+            'filter_autop' => array('weight' => 2,'status' => 1,),
+            // HTML corrector filter.
+            'filter_htmlcorrector' => array('weight' => 10,'status' => 1,),
+        ),
+    );
+    $filtered_html_format = (object) $filtered_html_format;
+    filter_format_save($filtered_html_format);
+
+    $full_html_format = array(
+        'format' => 'full_html', 'name' => 'Full HTML',
+        'weight' => 1, 'filters' => array(
+            // URL filter.
+            'filter_url' => array('weight' => 0, 'status' => 1),
+            // Line break filter.
+            'filter_autop' => array('weight' => 1, 'status' => 1),
+            // HTML corrector filter.
+            'filter_htmlcorrector' => array('weight' => 10, 'status' => 1),
+        ),
+    );
+    $full_html_format = (object) $full_html_format;
+    filter_format_save($full_html_format);
+
+    // Enable some standard blocks.
+    $default_theme = variable_get('theme_default', 'cms_ecommunity_theme');
+    $admin_theme = 'seven';
+    $blocks = array(
+		array(
+            'module' => 'system',
+			'delta' => 'main',
+            'region' => 'content',
+            'theme' => $default_theme,
+            'status' => 1,
+			'weight' => 0,
+			'pages' => '',
+			'title' => '',
+			'cache' => -1,
+        ),
+		array(
+			'module' => 'search',
+			'delta' => 'form',
+			'theme' => $default_theme,
+			'status' => 1,
+			'weight' => -1,
+			'region' => 'header',
+			'pages' => '',
+			'title' => t('<none>'),
+			'cache' => -1,
+		),
+        array(
+            'module' => 'user',
+			'delta' => 'login',
+            'region' => 'content',
+            'theme' => $default_theme,
+            'status' => 1,
+			'weight' => 0,
+			'pages' => '',
+			'title' => '',
+			'cache' => -1,
+        ),
+        array(
+          	'module' => 'system',
+			'delta' => 'navigation',
+          	'region' => -1,
+          	'theme' => $default_theme,
+          	'status' => 0,
+			'weight' => 0,
+			'pages' => '',
+			'title' => '',			
+			'cache' => -1,
+        ),
+        array(
+            'module' => 'node',
+			'delta' => 'recent',
+            'region' => 'dashboard_main',
+            'theme' => $admin_theme,
+			'status' => 1,
+			'weight' => 10,
+            'pages' => '',
+			'title' => '',
+			'cache' => -1,
+        ),
+        array(
+	        'module' => 'system',
+			'delta' => 'help',
+          	'region' => 'help',
+          	'theme' => $default_theme,
+          	'status' => 1,
+			'weight' => 0,
+			'pages' => '',
+			'title' => '',			
+			'cache' => -1,
+        ),
+        array(
+          	'module' => 'system', 
+			'delta' => 'main',
+          	'region' => 'content',
+          	'theme' => $admin_theme,
+          	'status' => 1,
+			'weight' => 0,
+			'pages' => '',
+			'title' => '',			
+			'cache' => -1,
+        ),
+        array(
+          	'module' => 'system',
+			'delta' => 'help',
+          	'region' => 'help',
+          	'theme' => $admin_theme,
+          	'status' => 1,
+			'weight' => 0,
+			'pages' => '',
+			'title' => '',			
+			'cache' => -1,
+        ),
+        array(
+          	'module' => 'user',
+			'delta' => 'login',
+          	'region' => 'content',
+          	'theme' => $admin_theme,
+          	'status' => 1,
+			'weight' => 10,
+			'pages' => '',
+			'title' => '',			
+			'cache' => -1,
+        ),
+        array(
+          	'module' => 'user',
+			'delta' => 'new',
+          	'region' => 'dashboard_sidebar',
+          	'theme' => $admin_theme,
+          	'status' => 1,
+			'weight' => 0,
+			'pages' => '', 
+			'title' => '',				
+			'cache' => -1,
+        ),
+        array(
+          	'module' => 'search',
+			'delta' => 'form',
+          	'region' => 'dashboard_sidebar',
+          	'theme' => $admin_theme,
+          	'status' => 1, 
+		  	'weight' => -10, 
+		  	'pages' => '',
+		  	'title' => t('<none>'),
+		  	'cache' => -1,
+        ),
+    );
+
+    $query = db_insert('block')
+        ->fields(
+            array(
+                'module', 'delta', 'theme', 'status', 'weight',
+                'region', 'pages', 'title', 'cache'
+            )
+        );
+    foreach ($blocks as $block) {
+        $query->values($block);
+    }
+    $query->execute();
+
+    // Insert default pre-defined node types into the database. For a complete
+    // list of available node type attributes, refer to the node type API
+    // documentation at: http://api.drupal.org/api/HEAD/function/hook_node_info.
+    $types = array(
+        array(
+            'type' => 'page', 'name' => st('Basic page'),
+            'base' => 'node_content',
+            'description' =>  st("Use <em>basic pages</em> for your static content, such as an 'About us' page."),
+            'custom' => 1,
+            'modified' => 1,
+            'locked' => 0,
+        ),
+    );
+
+    foreach ($types as $type) {
+        $type = node_type_set_defaults($type);
+        node_type_save($type);
+        node_add_body_field($type);
+    }
+
+    // Insert default pre-defined RDF mapping into the database.
+    $rdf_mappings = array(
+        array('type' => 'node', 'bundle' => 'page', 'mapping' => array(
+                'rdftype' => array('foaf:Document'),
+            ),
+        ),
+    );
+    foreach ($rdf_mappings as $rdf_mapping) {
+        rdf_mapping_save($rdf_mapping);
+    }
+
+    // Default "Basic page" to not be promoted and have comments disabled.
+    variable_set('node_options_page', array('status'));
+    variable_set('comment_page', COMMENT_NODE_HIDDEN);
+
+    // Hide date and author information for "Basic page" nodes by default.
+    variable_set('node_submitted_page', FALSE);
+
+	// Create custom image style
+	$style = image_style_save(array('name' => 'userimage','label'=>'UserImage'));
+
+	$effect = array(
+		'name' => 'image_scale',
+		'data' => array(
+			'width' => 64,
+			'height' => '',
+			'upscale' => FALSE,
+		),
+		'isid' => $style['isid'],
+	);
+	image_effect_save($effect);
+
+    // Enable user picture support and set default to a square thumbnail option.
+    variable_set('user_pictures', '1');
+	variable_set('user_picture_default', 'profiles_pictures/default.png');
+    variable_set('user_picture_dimensions', '1024x1024');
+    variable_set('user_picture_file_size', '800');
+    variable_set('user_picture_style', 'userimage');
+
+    // Allow visitor account creation with administrative approval.
+    variable_set('user_register',
+        USER_REGISTER_VISITORS_ADMINISTRATIVE_APPROVAL);
+
+   // Enable default permissions for system roles.
+    $filtered_html_permission = filter_permission_name($filtered_html_format);
+    user_role_grant_permissions(DRUPAL_ANONYMOUS_RID,
+        array('access content', 'access comments', $filtered_html_permission));
+    user_role_grant_permissions(DRUPAL_AUTHENTICATED_RID,
+        array('access content', 'access comments', 'post comments', 'search content', 'use advanced search',
+            'skip comment approval', $filtered_html_permission));
+
+    // Create a default role for site administrators, with all permissions
+    $admin_role = new stdClass();
+    $admin_role->name = 'administrator';
+    $admin_role->weight = 2;
+    user_role_save($admin_role);
+    user_role_grant_permissions($admin_role->rid,
+        array_keys(module_invoke_all('permission')));
+    // Set this as the administrator role.
+    variable_set('user_admin_role', $admin_role->rid);
+
+    // Assign user 1 the "administrator" role.
+    db_insert('users_roles')
+        ->fields(array('uid' => 1, 'rid' => $admin_role->rid))
+        ->execute();
+
+	// Create E-Community specific roles
+	$nfp_role = new stdClass();
+	$nfp_role->name = 'NFP';
+	$nfp_role->weight = 4;
+	user_role_save($nfp_role);
+	$nfp_permissions = array('access content'/*, 'access comments'*/);
+	user_role_grant_permissions($nfp_role->rid,$nfp_permissions);
+
+	$secretariat_role = new stdClass();
+	$secretariat_role->name = 'CMS Secretariat';
+	$secretariat_role->weight = 3;
+	user_role_save($secretariat_role);
+	$secretariat_permissions = array('access content', 'access comments');
+	user_role_grant_permissions($secretariat_role->rid,$secretariat_permissions);
+
+    // Create links in the main menu.
+	$items = array(
+		array(
+			'link_title' => st('E-Community'),
+			'link_path' => 'node',
+			'menu_name' => 'main-menu',
+			'language' => 'en',
+			'customized' => 1,
+			'expanded' => 0,
+			'has_children' => 1,
+			'weight' => '-47',
+			'i18n_mode' => 1,
+		),array(
+			'link_title' => st('Introduction'),
+			'link_path' => '<front>',
+			'language' => 'en',
+			'customized' => 1,
+			'menu_name' => 'main-menu',
+			'parent_identifier' => 'main-menu:node',
+			'weight' => '-43',
+			'i18n_mode' => 1,
+		),array(
+			'link_title' => st('Forum'),
+			'link_path' => 'forum',
+			'language' => 'en',
+			'customized' => 1,
+			'menu_name' => 'main-menu',
+			'parent_identifier' => 'main-menu:node',
+			'weight' => '-44',
+			'i18n_mode' => 1,
+		)
+	);
+
+	foreach ($items as $item){
+		menu_link_save($item);
+	}
+
+	menu_rebuild();	
+
+	// Execute the E-Community customizations
+    _e_community_customizations_install();
+
+	// Update the menu router information.
+    menu_rebuild();
+    // Rebuild access permissions
+    node_access_rebuild();
+
+	if (module_exists('wysiwyg')) {
+    	_e_community_set_wysiwyg_settings();
+	}
+}
+
+
+function _e_community_customizations_install() {
+   /* Set default country, first day of the month and date format */
+    variable_set('date_first_day', '1');
+    variable_set('site_default_country', 'DE');
+    variable_set('date_default_timezone', 'Europe/Berlin');
+    variable_set('configurable_timezones', '0');
+    variable_set('user_default_timezone', '0');
+
+    /* Setup languages */
+    _e_community_install_languages();
+    _e_community_install_language_detection();
+
+    /* Internationalization */
+    variable_set('i18n_node_default_language_none', '1');
+    variable_set('i18n_string_allowed_formats', array(
+        'filtered_html'   => 'filtered_html',
+        'full_html'       => 'full_html',
+        'plain_text'      => 'plain_text',
+        'unfiltered_html' => 'unfiltered_html'
+    ));
+
+    variable_set('cron_safe_threshold', '0');
+
+	/* Customizations for E-Community instance */
+	_e_community_install_basic_page_configure();
+    _e_community_install_title();
+    _e_community_install_entity_translation();
+	_e_community_init_taxonomies();
+	_e_community_init_blocks();
+
+	/* Enable custom modules*/
+	$modules = array(
+		'article',
+		'practice_example',
+		'nfp_manual',
+		'community_checklist',
+		'community_faq',
+		'funding_programme',
+		'nfp_profile'
+    );
+    if(!module_enable($modules)) {
+        drupal_set_message('Failed to enable custom modules', 'error');
+    }
+
+	$modules = array(
+		'training_event',
+    );
+    if(!module_enable($modules)) {
+        drupal_set_message('Failed to enable custom module - ecommunity training event', 'error');
+    }
+
+	$modules = array(
+		'e_community_views'
+    );
+    if(!module_enable($modules)) {
+        drupal_set_message('Failed to enable custom module - ecommunity views', 'error');
+    }
+
+	/* Set jquery versions - JQuery Update */
+	variable_set('jquery_update_jquery_version', '1.7');
+	variable_set('jquery_update_jquery_admin_version', '1.5');
+
+	/* Create dummy pages */
+	_e_community_dummy_pages();
+	
+	//_e_community_set_permissions_to_default_roles();
+}
+
+
+function _e_community_install_languages() {
+    $e_community_languages = array(
+          array("langcode" => "en", "prefix" => "en"),
+          array("langcode" => "fr", "prefix" => "fr"),
+          array("langcode" => "es", "prefix" => "es")
+    );
+    $languages = language_list();
+    foreach ($e_community_languages as $index => $language) {
+        $language = _e_community_install_sanitize_language($language);
+        if (array_key_exists($language['langcode'], $languages)) {
+            $properties = array(
+                'name', 'native', 'direction', 'domain', 'prefix'
+            );
+            $options = array();
+            // Keeps only valid properties defined in the configuration file.
+            foreach (array_keys($e_community_languages[$index]) as $key) {
+                if (in_array($key, $properties)) {
+                    $options[$key] = $language[$key];
+                }
+            }
+            if (!empty($options)) {
+                // Returns a new UpdateQuery object for the active database.
+                db_update('languages')
+                    ->fields($options)
+                    ->condition('language', $language['langcode'])
+                    ->execute();
+            }
+            continue;
+        }
+
+        // Predefined language selection.
+        include_once DRUPAL_ROOT . '/includes/iso.inc';
+        $predefined = _locale_get_predefined_list();
+        if (!isset($predefined[$language['langcode']])) {
+            watchdog(WATCHDOG_WARNING, dt('!langcode: Invalid language code',
+                array('!langcode' => $language['langcode']))
+            );
+
+            continue;
+        }
+
+        // Adds the language definition.
+        locale_add_language(
+            $language['langcode'],
+            $language['name'],
+            $language['native'],
+            $language['direction'],
+            $language['domain'],
+            $language['prefix'],
+            $language['enabled'],
+            $language['default']
+        );
+    }
+}
+
+
+function _e_community_install_language_detection() {
+    // /admin/config/regional/language/configure
+    if(!module_load_include('php', 'locale', 'locale.api')) {
+        throw new Exception('Cannot load locale.api.php');
+    }
+    if(!module_load_include('inc', 'locale', 'locale.admin')) {
+        throw new Exception('Cannot load locale.admin.inc');
+    }
+    $state = array();
+    $state['values']['language']['enabled'] = array(
+        'locale-url' => 1,
+        'locale-user' => 1,
+        'locale-session' => NULL,
+        'locale-browser' => NULL,
+        'language-default' => 1,
+    );
+    $state['values']['language_content']['enabled'] = array(
+        'locale-url' => 1,
+        'locale-session' => NULL,
+        'locale-user' => NULL,
+        'locale-browser' => NULL,
+        'locale-interface' => 1,
+        'language-default' => 1
+    );
+    drupal_form_submit('locale_languages_configure_form', $state);
+    $errors = form_get_errors();
+    if(!empty($errors)) {
+        var_dump($errors);
+    }
+}
+
+
+function _e_community_install_title() {
+    if(!module_load_include('inc', 'node', 'content_types')) {
+        throw new Exception('Cannot load content_types.inc');
+    }
+
+    if(!module_load_include('inc', 'title', 'title.admin')) {
+        throw new Exception('Cannot load title.admin.inc');
+    }
+
+    $types = array(
+        'page'
+    );
+
+    foreach ($types as $type) {
+        $state = array();
+
+        $state['values']['enabled'] = 1;
+
+        $type = node_type_load($type);
+
+        $state['build_info']['args']    = array('node', &$type, 'title');
+        $state['build_info']['form_id'] = 'title_field_replacement_form';
+        $state['build_info']['files']   = array(
+            'menu' => 'profiles/e_community/modules/contrib/title/title.admin.inc'
+        );
+
+        drupal_form_submit('title_field_replacement_form', $state);
+
+        $errors = form_get_errors();
+
+        if (!empty($errors)) {
+            foreach ($errors as $error) {
+                $msg = 'Error: %error';
+                $var = array('%error' => $error);
+
+                watchdog('e_community', $msg, $var, WATCHDOG_ERROR);
+            }
+        }
+    }
+}
+
+
+function _e_community_install_entity_translation() {
+    // /admin/config/regional/entity_translation
+    if(!module_load_include('inc', 'entity_translation', 'entity_translation.admin'))
+        throw new Exception('module_load_include: entity_translation.admin.inc: No such file or directory');
+
+    $state = array();
+
+    $state['values']['locale_field_language_fallback'] = NULL;
+    $state['values']['entity_translation_settings_node__article']['default_language'] = ENTITY_TRANSLATION_LANGUAGE_DEFAULT;
+    $state['values']['entity_translation_settings_node__page']['default_language']    = ENTITY_TRANSLATION_LANGUAGE_DEFAULT;
+
+    drupal_form_submit('entity_translation_admin_form', $state);
+
+    $errors = form_get_errors();
+
+    if (!empty($errors)) {
+        foreach ($errors as $error) {
+            $msg = 'Error: %error';
+            $var = array('%error' => $error);
+
+            watchdog('e_community', $msg, $var, WATCHDOG_ERROR);
+        }
+    }
+}
+
+
+function _e_community_install_basic_page_configure() {
+    // /admin/structure/types/manage/page
+    if(!module_load_include('inc', 'node', 'content_types')) {
+        throw new Exception('Cannot load content_types.inc');
+    }
+    $state = array();
+    // entity_translation/entity_translation.node.inc
+    $state['values']['language_content_type'] = ENTITY_TRANSLATION_ENABLED;
+    $state['values']['entity_translation_hide_translation_links'] = 1;
+
+    $type = node_type_load('page');
+    $state['build_info']['args'] = array(&$type);
+    $state['build_info']['form_id'] = 'node_type_form';
+    $state['build_info']['files'] = array(
+        'menu' => 'modules/node/content_types.inc'
+    );
+    drupal_form_submit('node_type_form', $state);
+    $errors = form_get_errors();
+    if(!empty($errors)) {
+        var_dump($errors);
+    }
+
+    // /admin/structure/types/manage/page/fields/body
+    if(!module_load_include('inc', 'field_ui', 'field_ui.admin')) {
+        throw new Exception('Cannot load field_ui.admin.inc');
+    }
+
+    $state = array();
+    $state['values']['field']['translatable'] = 1;
+
+    $field_instance = field_info_instance('node', 'body', 'page');
+    $state['build_info']['args'] = array(&$field_instance);
+    $state['build_info']['form_id'] = 'field_ui_field_edit_form';
+    $state['build_info']['files'] = array(
+        'menu' => 'modules/field_ui/field_ui.admin.inc'
+    );
+
+    drupal_form_submit('field_ui_field_edit_form', $state);
+    $errors = form_get_errors();
+    if(!empty($errors)) {
+        var_dump($errors);
+    }
+}
+
+
+/**
+ * Sanitizes a language definition.
+ *
+ * @param array $language An associative array describing a language.
+ *
+ * @return array An associative array with the sanitized language.
+ */
+function _e_community_install_sanitize_language($language) {
+    if (!isset($language['langcode'])) {
+        $language['name'] = NULL;
+    }
+
+    if (!isset($language['name'])) {
+        $language['name'] = NULL;
+    }
+
+    if (!isset($language['native'])) {
+        $language['native'] = NULL;
+    }
+
+    if (!isset($language['direction']) ||
+        $language['direction'] == 'LANGUAGE_LTR') {
+        $language['direction'] = LANGUAGE_LTR;
+    } else {
+        $language['direction'] = LANGUAGE_RTL;
+    }
+
+    if (!isset($language['domain'])) {
+        $language['domain'] = '';
+    }
+
+    if (!isset($language['prefix'])) {
+        $language['prefix'] = '';
+    }
+
+    if (!isset($language['enabled'])) {
+        $language['enabled'] = TRUE;
+    }
+
+    if (!isset($language['default'])) {
+        $language['default'] = FALSE;
+    }
+
+    return $language;
+}
+
+
+function _e_community_init_taxonomies(){
+	// Create taxonomies used in the E-Community distro
+	
+	// Create a default vocabulary named "Region", enabled for the 'article' content type.
+	$description = st('Use regions to group articles on similar regions into categories.');
+	$help = st('Select one or more regions to describe your content.');
+	$vocabulary = (object) array(
+		'name' => st('Region'),
+		'description' => $description,
+		'machine_name' => 'region',
+		'help' => $help,
+	);
+	taxonomy_vocabulary_save($vocabulary);
+
+	// Add default terms in region taxonomy
+	$vocabulary = taxonomy_vocabulary_machine_name_load('region');
+	$terms = array(
+		'Africa',
+		'Asia',
+		'Atlantic Ocean',
+		'Eastern Atlantic',
+		'Europe',
+		'Indian Ocean',
+		'Latin America',
+		'North America',
+		'North Pacific',
+		'Oceania',
+		'South & Central America & Caribbean',
+		'South Pacific',
+		'South-East Asia',
+		'South-West Asia',
+		'Southwestern Atlantic',
+		'West Africa',
+		'Western Pacific'	
+	);
+
+	_e_community_init_terms($vocabulary, $terms);
+
+	// Create a default vocabulary named "Instruments", enabled for the 'article' content type.
+	$description = st('Use instruments to group articles on similar instruments into categories.');
+	$help = st('Select one ore more instruments to describe your content.');
+	$vocabulary = (object) array(
+		'name' => st('Instrument'),
+		'description' => $description,
+		'machine_name' => 'instrument',
+		'help' => $help,
+	);
+	taxonomy_vocabulary_save($vocabulary);
+
+	// Add default terms in instrument taxonomy
+	$vocabulary = taxonomy_vocabulary_machine_name_load('instrument');
+	$terms = array(
+		'ACAP',
+		'ACCOBAMS',
+		'AEWA',
+		'ASCOBANS',
+		'CMS',
+		'EUROBATS',
+		'Gorillas Agreement',
+		'Wadden Sea Seals',
+		'African Cetaceans Manatees',
+		'Andean Flamingos',
+		'Aquatic Warbler',
+		'Birds of Prey (Raptors)',
+		'Bukhara Deer',
+		'Dugongs',
+		'Grassland Birds',
+		'Great Bustard',
+		'Huemul',
+		'Marine Turtles Africa',
+		'Marine Turtles IOSEA',
+		'Monk Seal',
+		'Pacific Islands Cetaceans',
+		'Ruddy-headed Goose',
+		'Saiga Antelope',
+		'Sharks',
+		'Siberian Crane',
+		'Slender-billed Curlew',
+		'West African Elephant',
+		'African Eurasian Migratory Landbirds',
+		'Central Asian Flyway',
+		'Central Eurasian Aridland Mammals',
+		'Sahelo-Saharan Antelopes'
+	);
+
+	_e_community_init_terms($vocabulary, $terms);
+
+	// Create a default vocabulary named "Tags", enabled for the 'article' content type.
+	$description = st('Use tags to group articles on similar topics into categories.');
+	$help = st('Enter a comma-separated list of words to describe your content.');
+	$vocabulary = (object) array(
+		'name' => st('Tags'),
+		'description' => $description,
+		'machine_name' => 'tags',
+		'help' => $help,
+	);
+	taxonomy_vocabulary_save($vocabulary);
+	drupal_flush_all_caches();
+
+	// Create a default vocabulary named "Event Type", enabled for the 'Training Event' content type.
+	$description = st('Use event type to assign a type for your training event.');
+	$help = st('Select the type of the event.');
+	$vocabulary = (object) array(
+		'name' => st('Event Type'),
+		'description' => $description,
+		'machine_name' => 'event_type',
+		'help' => $help,
+	);
+	taxonomy_vocabulary_save($vocabulary);
+
+	// Add default terms in instrument taxonomy
+	$vocabulary = taxonomy_vocabulary_machine_name_load('event_type');
+	$terms = array(
+		'Seminar',
+		'Workshop'
+	);
+
+	_e_community_init_terms($vocabulary, $terms);
+
+	drupal_flush_all_caches();
+}
+
+/**
+ * Add terms into vocabulary.
+ *
+ * @param Object $vocabulary - the taxonomy in that you want to include tersm.
+ *
+ * @param array $terms - list of terms that you want to insert into taxonomy.
+ */
+function _e_community_init_terms($vocabulary, $terms){
+	foreach ($terms as $name) {
+      $term = (object) array(
+        'name' => t($name),
+        'vid'  => $vocabulary->vid
+      );
+
+      if (!taxonomy_get_term_by_name($term->name, $vocabulary->machine_name))
+        taxonomy_term_save($term);
+    }
+}
+
+
+/**
+ * Enable blocks for E-Community distro
+ */
+function _e_community_init_blocks(){
+	// Enable some support blocks.
+	$default_theme = variable_get('theme_default', 'cms_ecommunity_theme');
+	$admin_theme = 'seven';
+/*
+	$menu_block = array(
+	  'module' => 'menu',
+	  'delta' => $menu['main_menu'],
+	  'theme' => '$default_theme',
+	  'region' => 'secondary_menu',
+	  'status' => 1,
+	  'title' => t('<none>'),
+      'cache' => -1,
+      'i18n_mode' => 1
+	);
+*/
+	// Displays the "Who's online" block.
+	db_update('block')
+      ->fields(array('region' => 'sidebar_second', 'status' => 1, 'visibility' => 1, 'pages' => '<front>', 'cache' => -1))
+      ->condition('module', 'user')
+      ->condition('delta', 'online')
+      ->condition('theme', $default_theme)
+      ->execute();
+
+	// Displays the "Recent comments" block.
+	db_update('block')
+      ->fields(array('region' => 'content', 'status' => 1, 'visibility' => 1, 'pages' => '<front>', 'cache' => -1))
+      ->condition('module', 'comment')
+      ->condition('delta', 'recent')
+      ->condition('theme', $default_theme)
+      ->execute();
+}
+
+/**
+ * Sets default WYSIWYG settings for E-Community
+ */
+function _e_community_set_wysiwyg_settings() {
+  $settings = array(
+    'default' => 1,
+    'user_choose' => 1,
+    'show_toggle' => 1,
+    'theme' => 'advanced',
+    'language' => 'en',
+    'buttons' => array(
+      'default' => array(
+        'Bold' => 1,
+        'Italic' => 1,
+        'Underline' => 1,
+        'Strike' => 1,
+        'JustifyLeft' => 1,
+        'JustifyCenter' => 1,
+        'JustifyRight' => 1,
+        'BulletedList' => 1,
+        'NumberedList' => 1,
+        'Undo' => 1,
+        'Redo' => 1,
+        'Link' => 1,
+        'Unlink' => 1,
+        'Anchor' => 1,
+        'Image' => 1,
+        'Superscript' => 1,
+        'Subscript' => 1,
+        'Blockquote' => 1,
+        'HorizontalRule' => 1,
+        'Cut' => 1,
+        'Copy' => 1,
+        'Paste' => 1,
+        'PasteFromWord' => 1,
+        'RemoveFormat' => 1,
+        'SpecialChar' => 1,
+        'Format' => 1,
+        'Table' => 1,
+        'Maximize' => 1,
+      ),
+      'imce' => array(
+        'imce' => 1,
+      ),
+    ),
+    'toolbar_loc' => 'top',
+    'toolbar_align' => 'left',
+    'path_loc' => 'bottom',
+    'resizing' => 1,
+    'verify_html' => 1,
+    'preformatted' => 0,
+    'convert_fonts_to_spans' => 1,
+    'remove_linebreaks' => 1,
+    'apply_source_formatting' => 0,
+    'paste_auto_cleanup_on_paste' => 1,
+    'block_formats' => 'p,address,pre,h2,h3,h4,h5,h6,div',
+    'css_setting' => 'self',
+    'css_path' => '/profiles/e_community/libraries/ckeditor/skins/office2003/editor.css',
+    'css_classes' => '',
+  );
+  
+  $fields = array(
+    'format' => 'full_html',
+    'editor' => 'ckeditor',
+    'settings' => serialize($settings),
+  );
+
+  db_insert('wysiwyg')->fields($fields)->execute();
+  
+  db_update('filter_format')
+  ->condition('format', 'filtered_html')
+  ->fields(array('weight' => 1))
+  ->execute();
+  
+  db_update('filter_format')
+  ->condition('format', 'full_html')
+  ->fields(array('weight' => 0))
+  ->execute();
+}
+
+/**
+ * Sets permissions for default roles from E-Community
+ */
+function _e_community_set_permissions_to_default_roles() {
+	$admin_role = user_role_load_by_name('administrator');
+
+	user_role_grant_permissions($admin_role->rid,array_keys(module_invoke_all('permission')));
+
+	// Rebuild access permissions
+    node_access_rebuild();
+}
+
+/**
+ * Create dummy pages for common portal - about, meetings, countries
+ */
+function _e_community_dummy_pages(){
+	global $user;
+
+	// create dummy about page
+	$customNode = new stdClass();
+	$customNode->type = 'page';
+	node_object_prepare($customNode);
+	$customNode->uid = $user->uid;
+	$customNode->name = $user->name;
+	$customNode->title = 'About';
+	$customNode->language = 'en';
+	$customNode->body[$customNode->language][0]['value'] = '<div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris pellentesque massa id urna vestibulum, in tempor lorem sagittis. Curabitur pharetra vel dolor nec tincidunt. Etiam rhoncus sem vel massa rutrum, a sollicitudin elit ultrices. Pellentesque facilisis neque sit amet metus malesuada eleifend. Morbi nec leo eros. Vivamus luctus facilisis sem non facilisis. Cras eu tempus eros.</div><div><br></div><div>Praesent non tellus lacus. Fusce pretium lorem eros, et placerat quam pretium vel. Ut quam eros, dictum in velit a, fermentum vulputate diam. Fusce non lobortis lorem, ut auctor urna. Nam in vulputate lacus. Mauris molestie mattis neque id ultricies. Proin sit amet metus eleifend, interdum velit quis, sagittis arcu. Etiam porttitor justo vitae lobortis pharetra. Integer lectus lectus, blandit ac justo id, vulputate laoreet erat. Aliquam aliquet mauris ac condimentum fermentum. Curabitur eget nulla sit amet turpis malesuada dapibus nec ut lorem. Vivamus sodales dictum tempus.</div><div><br></div><div>Sed rhoncus bibendum accumsan. Etiam feugiat eleifend vehicula. Fusce varius rhoncus enim eget cursus. Nullam luctus velit eu mi lobortis pellentesque. Phasellus volutpat gravida turpis nec vehicula. Integer cursus ligula a est pellentesque consectetur. Maecenas volutpat aliquet justo, ac tincidunt velit rutrum non. Sed magna dui, auctor molestie purus quis, lobortis scelerisque lectus. Vestibulum ut pharetra sapien. Vivamus vitae lorem hendrerit, rutrum nisl vitae, feugiat lectus. Vestibulum rutrum metus turpis, ut fringilla dolor interdum non. Vestibulum mi diam, fringilla non gravida quis, mattis placerat neque. Nullam convallis, sapien eget volutpat scelerisque, neque mi ultricies sem, nec iaculis mi sapien sit amet eros.</div><div><br></div><div>Proin lacinia dignissim mauris, sed commodo sapien bibendum sit amet. Nam ac pharetra elit. Maecenas convallis lorem erat, vitae rhoncus massa aliquet sed. Integer ac ipsum mattis, gravida risus in, interdum neque. Ut vitae adipiscing est. Pellentesque nec augue non purus tempus pharetra ut id massa. Phasellus nec enim at ligula eleifend adipiscing vel eget ante. Aliquam sit amet erat id nibh dapibus rutrum.</div><div><br></div><div>Nunc consequat lobortis diam, commodo vehicula nisi adipiscing vel. Donec semper nisl lorem, in luctus erat ullamcorper a. Sed tortor felis, sagittis in egestas sit amet, commodo at augue. Sed blandit lobortis quam nec tempor. Interdum et malesuada fames ac ante ipsum primis in faucibus. Mauris ultricies nunc quis luctus porttitor. Etiam mollis purus enim, et varius dolor faucibus in. Integer euismod velit sit amet tincidunt dapibus. Pellentesque non varius urna. Aenean gravida nunc urna, vitae tempor purus ultricies vitae. In mollis nulla id tempus pharetra. Aenean vitae molestie lacus, vel sollicitudin nisl. Quisque et malesuada lorem.</div>';
+	$customNode->body[$customNode->language][0]['summary'] = '';
+	$customNode->body[$customNode->language][0]['format'] = 'full_html';
+	$customNode->menu['enabled'] = 1;       // 1 to enable providing a link in main menu
+	$customNode->menu['link_title'] = 'About';
+	$customNode->menu['description'] = 'About - CMS Common Portal';
+	$customNode->menu['parent'] = 'main-menu:0';
+	$customNode->menu['weight'] = -50;
+	$customNode->path['alias'] = '';
+	$customNode->comment = 0;
+	$customNode->status = 1;        // 1 means published
+	$customNode->promote = 0;
+	$customNode->revision = 0;
+	$customNode->changed = $_SERVER['REQUEST_TIME'];
+	$customNode->created = $_SERVER['REQUEST_TIME'];
+	node_submit($customNode);
+	node_save($customNode);
+
+	// create dummy meetings page
+/*	$customNode = new stdClass();
+	$customNode->type = 'page';
+	node_object_prepare($customNode);
+	$customNode->uid = $user->uid;
+	$customNode->name = $user->name;
+	$customNode->title = 'Meetings';
+	$customNode->language = 'en';
+	$customNode->body[$customNode->language][0]['value'] = '<ul><li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li><li>Aenean sed lectus in odio imperdiet fermentum.</li><li>Etiam non eros a felis mollis bibendum.</li><li>Phasellus quis est ac ipsum commodo hendrerit a convallis purus.</li><li>Praesent ut velit nec ligula posuere adipiscing.</li><li>Proin ac leo lacinia erat ullamcorper iaculis vel in enim.</li><li>Nullam nec purus ac odio condimentum interdum.</li><li>Donec faucibus est a dapibus laoreet.</li><li>Sed blandit neque vitae risus tempor auctor.</li><li>Sed vitae mi id libero mattis laoreet ut vitae justo.</li><li>Duis condimentum sem in lorem fermentum, eu condimentum nulla tincidunt.</li><li>Sed sollicitudin eros ut euismod dictum.</li><li>In sit amet tortor vel magna posuere commodo eu quis massa.</li><li>Phasellus fermentum ipsum eget dui ultrices, nec vestibulum risus congue.</li></ul>';
+	$customNode->body[$customNode->language][0]['summary'] = '';
+	$customNode->body[$customNode->language][0]['format'] = 'full_html';
+	$customNode->menu['enabled'] = 1;       // 1 to enable providing a link in main menu
+	$customNode->menu['link_title'] = 'Meetings';
+	$customNode->menu['description'] = 'Meetings - CMS Common Portal';
+	$customNode->menu['parent'] = 'main-menu:0';
+	$customNode->menu['weight'] = -49;
+	$customNode->path['alias'] = '';
+	$customNode->comment = 0;
+	$customNode->status = 1;        // 1 means published
+	$customNode->promote = 0;
+	$customNode->revision = 0;
+	$customNode->changed = $_SERVER['REQUEST_TIME'];
+	$customNode->created = $_SERVER['REQUEST_TIME'];
+	node_submit($customNode);
+	node_save($customNode);
+
+	// create dummy countries page
+	$customNode = new stdClass();
+	$customNode->type = 'page';
+	node_object_prepare($customNode);
+	$customNode->uid = $user->uid;
+	$customNode->name = $user->name;
+	$customNode->title = 'Countries';
+	$customNode->language = 'en';
+	$customNode->body[$customNode->language][0]['value'] = '<ul><li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li><li>Cras semper diam vitae consectetur lobortis.</li><li>Praesent accumsan justo sed congue dictum.</li><li>Suspendisse fermentum arcu a odio tincidunt feugiat.</li><li>Donec quis lectus hendrerit purus accumsan pretium.</li><li>Proin eu diam aliquam, volutpat enim sed, condimentum nulla.</li><li>Quisque lacinia diam id lacus condimentum tincidunt vel vitae turpis.</li><li>Proin sed purus nec ligula consectetur interdum at ac est.</li><li>Nullam quis ante sagittis, rhoncus tortor id, imperdiet ante.</li><li>Sed imperdiet ipsum nec mauris fermentum faucibus.</li><li>Curabitur lobortis nibh quis mi gravida faucibus.</li><li>Sed adipiscing felis at lectus rutrum auctor.</li><li>Fusce volutpat felis at ante faucibus adipiscing quis non lectus.</li><li>Mauris auctor sapien pretium, adipiscing lorem et, bibendum libero.</li><li>Praesent vitae quam vel nisi porttitor congue.</li><li>Ut non sapien tempus, interdum elit laoreet, imperdiet sem.</li></ul>';
+	$customNode->body[$customNode->language][0]['summary'] = '';
+	$customNode->body[$customNode->language][0]['format'] = 'full_html';
+	$customNode->menu['enabled'] = 1;       // 1 to enable providing a link in main menu
+	$customNode->menu['link_title'] = 'Countries';
+	$customNode->menu['description'] = 'Countries - CMS Common Portal';
+	$customNode->menu['parent'] = 'main-menu:0';
+	$customNode->menu['weight'] = -48;
+	$customNode->path['alias'] = '';
+	$customNode->comment = 0;
+	$customNode->status = 1;        // 1 means published
+	$customNode->promote = 0;
+	$customNode->revision = 0;
+	$customNode->changed = $_SERVER['REQUEST_TIME'];
+	$customNode->created = $_SERVER['REQUEST_TIME'];
+	node_submit($customNode);
+	node_save($customNode); */
+}
