@@ -270,6 +270,10 @@ if(file_exists($json_path)) {
 $options['init-modules'] = array(
 );
 
+// Exclude domains symlinks from archive-dump
+$command_specific['archive-dump'] = array(
+  'tar-options' => '--exclude=sites/default/files',
+);
 
 $options['init-themes'] = array(
 );
