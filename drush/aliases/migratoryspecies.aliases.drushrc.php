@@ -1,6 +1,6 @@
 <?php
 
-$aliases['migratoryspecies.prod'] = array(
+$aliases['prod'] = array(
   'uri' => '',
   'remote-host' => '',
   'remote-user' => '',
@@ -15,7 +15,7 @@ $aliases['migratoryspecies.prod'] = array(
   ),
 );
 
-$aliases['migratoryspecies.dev'] = array(
+$aliases['dev'] = array(
   'uri' => '',
   'remote-host' => '',
   'remote-user' => '',
