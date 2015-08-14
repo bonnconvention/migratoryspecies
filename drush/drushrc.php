@@ -254,20 +254,27 @@ $options['structure-tables']['common'] = array(
  */
 
 // Read JSON configuration file from conf/ and pre-configure drush commands
-$json_path = dirname(__FILE__) . '/../conf/config.json';
-
-$cfg = (object) array('variables' => (object) array('environment' => 'production'));
-if(file_exists($json_path)) {
+$json_path = __DIR__ . '/../conf/config.json';
+global $cfg;
+if (file_exists($json_path)) {
   $cfg = json_decode(file_get_contents($json_path));
   $db_url = sprintf('mysql://%s:%s@%s:%s/%s', $cfg->db->username, $cfg->db->password, $cfg->db->host, $cfg->db->port, $cfg->db->database);
   $command_specific['site-install'] = array(
     'db-url' => $db_url,
-    'account-mail' => $cfg->admin->email, 'account-name' => $cfg->admin->username, 'account-pass' => $cfg->admin->password,
-    'db-su' => $cfg->db->root_username, 'db-su-pw' => $cfg->db->root_password
+    'account-mail' => $cfg->admin->email,
+    'account-name' => $cfg->admin->username,
+    'account-pass' => $cfg->admin->password,
+    'db-su' => $cfg->db->root_username,
+    'db-su-pw' => $cfg->db->root_password
   );
 }
+$options['variables'] = (array) $cfg->variables;
 
 $options['init-modules'] = array(
+  'facetapi',
+  'search_api_et',
+  'search_api_et_solr',
+  'search_api_solr',
 );
 
 // Exclude domains symlinks from archive-dump

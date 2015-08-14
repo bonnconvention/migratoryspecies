@@ -3,7 +3,13 @@
 # Go to docroot/
 cd docroot/
 
-drush site-install -y
+if [ ! -f ./sites/default/settings.php ]; then
+  chmod u+w sites/default
+  drush site-install -y
+  chmod u+w sites/default/settings.php
+  chmod u-w sites/default/settings.php
+  chmod u-w sites/default
+fi
 
 pre_update=  post_update=
 while getopts b:a: opt; do
@@ -18,16 +24,18 @@ while getopts b:a: opt; do
 done
 
 # Sync from edw staging
-drush downsync_sql @migratoryspecies.prod @migratoryspecies.local -y -v
+echo "Run downsync_sql ..."
+drush downsync_sql @prod @local -y -v
+
+# Devify - development settings
+drush devify_solr
 
 if [ ! -z "$pre_update" ]; then
 echo "Run pre update"
 ../$pre_update
 fi
 
-# Devify - development settings
-drush devify --yes
-#drush devify_solr
+drush cc all
 
 # Build the site
 drush custom_build -y
@@ -40,3 +48,8 @@ echo "Run post update"
 fi
 
 drush cc all
+
+chmod u+w robots.txt
+  echo "User-agent: *" >> robots.txt
+  echo "Disallow: /" >> robots.txt
+chmod u-w robots.txt
