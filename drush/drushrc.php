@@ -282,6 +282,10 @@ $command_specific['archive-dump'] = array(
   'tar-options' => '--exclude=sites/default/files',
 );
 
+$command_specific['sql-sync'] = array(
+  'structure-tables-list' => 'cache*,history,sessions,watchdog,ctools_css_cache,ctools_object_cache'
+);
+
 $options['init-themes'] = array(
 );
 
@@ -298,6 +302,16 @@ $command_specific['devify'] = array(
   'delete-variables' => array('googleanalytics_account'),
   'reset-variables' => array_merge(
     array(
+      'reroute_email_enable_message' => TRUE,
+      'reroute_email_enable' => TRUE,
+      'stage_file_proxy_origin' => 'http://cms.int',
+      'stage_file_proxy_use_imagecache_root' => TRUE,
+      'stage_file_proxy_hotlink' => TRUE,
+      'reroute_email_address' => $cfg->variables->site_mail,
+      'smtp_from' => $cfg->variables->site_mail,
+      'smtp_fromname' => $cfg->variables->site_name,
+      'preprocess_css' => 0,
+      'preprocess_js' => 0,
     )
     , (array) $cfg->variables),
 );
