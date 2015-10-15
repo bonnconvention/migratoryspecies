@@ -19,11 +19,6 @@
  * variables being passed to the hooks.
  *
  *
- * system_modules_submit() [The form at /admin/build/modules is submitted]
- *   -> {provider}_install() [Drupal hook]
- *   -> {provider}_enable() [Drupal hook]
- *   -> {provider}_scald_provider()
- *
  * scald_render()
  *   -> scald_fetch()
  *     -> {type_provider}_scald_fetch($mode = 'type')
@@ -45,6 +40,42 @@
  */
 
 /**
+ * Define information about display contexts provided by a module.
+ *
+ * A Scald display context provider has full control and is also responsible for
+ * the display of fields in the atom. If you don't want very optimized context,
+ * then you can create custom context using Scald UI (in this case Scald core is
+ * the context provider of those custom contexts).
+ *
+ * Custom contexts are stored in the 'scald_custom_contexts' variable.
+ *
+ * @return array
+ *   An array of display contexts. This array is keyed by the machine-readable
+ *   context name. Each context is defined as an associative array
+ *   containing the following item:
+ *   - "title": the human-readable name of the context.
+ *   - "description": the longer description of the context.
+ *   - "render_language": atom source language. Required for SAS conversion.
+ *   - "parseable": whether the atom can be wrapped in HTML comments
+ *     to be identified inside markup.
+ *   - "hidden": whether the atom is invisible. Defaults to FALSE.
+ *   - "formats": array of supported formats for each atom type. Currently
+ *     unused.
+ */
+function hook_scald_contexts() {
+  return array(
+    'custom_context' => array(
+      'title'           => t('Custom context'),
+      'description'     => t('A context to provide customized rendering.'),
+      'render_language' => 'XHTML',
+      'parseable'       => TRUE,
+      'hidden'          => FALSE,
+      'formats'         => array(),
+    ),
+  );
+}
+
+/**
  * Define information about atom providers provided by a module.
  *
  * @return
@@ -63,26 +94,62 @@ function hook_scald_atom_providers() {
 }
 
 /**
- * Define information about atom actions.
+ * Define additional information about atom providers provided by a module.
  *
- * The 'create' action machine name is reserved by Scald core and must not be
- * used.
- *
- * @return array
- *   The array is keyed by action machine name, each array element is another
- *   array, keyed by
- *   - 'title'
- *   - 'adjective': with -able suffix to generate permission name
- *   - 'description'
+ * @return
+ *   An array of options per provider. This array is keyed by the unified atom type.
+ *   Each provider can define any number of additional options to be used elsewhere.
  */
-function hook_scald_actions() {
+function hook_scald_atom_providers_opt() {
+  // The starting_step can be used to skip the add step
+  // when the provider does not need it.
   return array(
-    'embed' => array(
-      'title' => t('Embed'),
-      'adjective' => t('Embedable'),
-      'description' => t('Allows to embed atom in a 3rd website.'),
+    'gallery' => array(
+      'starting_step' => 'options',
     ),
   );
+}
+
+/**
+ * Alters the list of providers and their labels.
+ */
+function hook_scald_atom_providers_alter(&$types) {
+  $types['image']['scald_image'] = 'Renamed Image Provider';
+}
+
+/**
+ * Alters the additional options of the providers.
+ * Do not alter the label in this hook. It is only there for simplicity.
+ */
+function hook_scald_atom_providers_opt_alter(&$types) {
+  // In case the provider changed the starting step, It can be changed back.
+  $types['gallery']['scald_gallery']['starting_step'] = 'add';
+}
+
+/**
+ * Define information about atom transcoders provided by a module.
+ *
+ * @return array $transcoder
+ *   An array of atom transcoders. This array is keyed by the machine-readable
+ *   transcoder name. Each transcoder is defined as an associative array
+ *   containing the following item:
+ *   - "title": the human-readable name of the transcoder.
+ *   - "description": the longer description of the transcoder.
+ *   - "formats": array of supported formats for each atom type. Currently unused.
+ */
+function hook_scald_transcoders() {
+  $transcoders = array();
+  foreach (image_styles() as $name => $style) {
+    $label = isset($style['label']) ? $style['label'] : $style['name'];
+    $transcoders['style-' . $name] = array(
+      'title' => t('@style (Image style)', array('@style' => $label)),
+      'description' => t('Use the Image style @style to prepare the image', array('@style' => $label)),
+      'formats' => array(
+        'image' => 'passthrough',
+      ),
+    );
+  }
+  return $transcoders;
 }
 
 /**
@@ -128,6 +195,29 @@ function hook_scald_player_settings_form($form, &$form_state) {
 }
 
 /**
+ * Define information about atom actions.
+ *
+ * The 'create' action machine name is reserved by Scald core and must not be
+ * used.
+ *
+ * @return array
+ *   The array is keyed by action machine name, each array element is another
+ *   array, keyed by
+ *   - 'title'
+ *   - 'adjective': with -able suffix to generate permission name
+ *   - 'description'
+ */
+function hook_scald_actions() {
+  return array(
+    'embed' => array(
+      'title' => t('Embed'),
+      'adjective' => t('Embedable'),
+      'description' => t('Allows to embed atom in a 3rd website.'),
+    ),
+  );
+}
+
+/**
  * Respond to atom insertion.
  *
  * This hook is only invoked for the module providing the atom type or atom
@@ -147,7 +237,7 @@ function hook_scald_register_atom($atom, $mode) {
 /**
  * Respond to atom update.
  *
- /* Similar to hook_scald_register_atom(), but this hook is invoked for existing
+ * Similar to hook_scald_register_atom(), but this hook is invoked for existing
  * atoms.
  *
  * @param $atom
@@ -288,6 +378,19 @@ function hook_scald_wysiwyg_context_list_alter(&$contexts) {
 }
 
 /**
+ * Alters links that show up in the drag and drop library.
+ *
+ * @param array $links
+ *   List of built action links.
+ *
+ * @param $atom
+ *   The atom that user action links are being built.
+ */
+function hook_scald_atom_user_build_actions_links_alter(&$links, $atom) {
+  unset($links['delete']);
+}
+
+/**
  * Control access to an atom.
  *
  * This hook can be used to grant or deny access for a specific atom and
@@ -306,6 +409,54 @@ function hook_scald_wysiwyg_context_list_alter(&$contexts) {
  *   The user object of the current user. This is an optional parameter.
  */
 function hook_scald_atom_access($atom, $action, $account = NULL) {
+}
+
+/**
+ * Act on an atom being inserted or updated.
+ *
+ * This hook is invoked from ScaldAtomController::save() before the atom is
+ * saved to the database. Like any other hook_ENTITY_TYPE_presave() hook, it is
+ * invoked before hook_entity_presave().
+ *
+ * @param $atom
+ */
+function hook_scald_atom_presave($atom) {
+}
+
+/**
+ * Act on an atom being inserted.
+ *
+ * This hook is invoked from ScaldAtomController::save() after a new atom is
+ * saved to the database, after field_attach_insert() and before
+ * hook_entity_insert() is called.
+ *
+ * @param $atom
+ */
+function hook_scald_atom_insert($atom) {
+}
+
+/**
+ * Act on an atom being updated.
+ *
+ * This hook is invoked from ScaldAtomController::save() after an existing atom
+ * is saved to the database, after field_attach_update() and before
+ * hook_entity_update() is called.
+ *
+ * @param $atom
+ */
+function hook_scald_atom_update($atom) {
+}
+
+/**
+ * Act on an atom being deleted.
+ *
+ * This hook is invoked from scald_atom_delete_multiple() after the atom is
+ * unregistered, before hook_entity_delete() is called and before the atom is
+ * removed from scald_atoms table in the database.
+ *
+ * @param $atom
+ */
+function hook_scald_atom_delete($atom) {
 }
 
 /**
@@ -359,14 +510,14 @@ function hook_scald_add_atom_count(&$form, &$form_state) {
  * form, into atoms.
  *
  * @param mixed $atoms
- *   An array of atoms if the provider implements
- *   hook_scald_add_atom_account_count(), otherwise a single atom.
+ *   An array of atoms if the provider implements hook_scald_add_atom_count(),
+ *   otherwise a single atom.
  *
  * @param array $form
  *
  * @param array $form_state
  */
-function scald_image_scald_add_form_fill(&$atoms, $form, $form_state) {
+function hook_scald_add_form_fill(&$atoms, $form, $form_state) {
   foreach ($atoms as $delta => $atom) {
     if (is_array($form_state['values']['file']) && module_exists('plupload')) {
       module_load_include('inc', 'scald', 'includes/scald.plupload');

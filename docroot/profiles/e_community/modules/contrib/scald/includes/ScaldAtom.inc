@@ -20,8 +20,19 @@ class ScaldAtom {
       'data' => array(),
     );
 
+    if (module_exists('entity_translation')) {
+      unset($values['language']);
+      $handler = entity_translation_get_handler('scald_atom',(object) $values);
+      $langcode = $handler->getLanguage();
+      $values['language'] = $langcode;
+    }
+
     foreach ($values as $key => $value) {
       $this->$key = $value;
     }
+  }
+
+  public function save() {
+    return ScaldAtomController::save($this);
   }
 }

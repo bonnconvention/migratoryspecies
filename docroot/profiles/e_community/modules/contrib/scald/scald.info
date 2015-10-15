@@ -6,7 +6,12 @@ core = 7.x
 dependencies[] = taxonomy
 dependencies[] = ctools
 dependencies[] = image
+dependencies[] = text
 
+test_dependencies[] = i18n
+test_dependencies[] = i18n_string
+
+files[] = includes/scald.translation_handler.inc
 files[] = includes/scald_views_handler_field_actions.inc
 files[] = includes/scald_views_handler_field_data.inc
 files[] = includes/scald_views_handler_field_representation.inc
@@ -16,9 +21,11 @@ files[] = includes/scald_views_handler_filter_atom_type.inc
 files[] = includes/ScaldAtom.inc
 files[] = includes/ScaldAtomController.inc
 files[] = tests/scald.test
-; Information added by drupal.org packaging script on 2013-07-24
-version = "7.x-1.1"
+files[] = scald.features.inc
+
+; Information added by Drupal.org packaging script on 2015-09-16
+version = "7.x-1.5"
 core = "7.x"
 project = "scald"
-datestamp = "1374669086"
+datestamp = "1442418555"
 
