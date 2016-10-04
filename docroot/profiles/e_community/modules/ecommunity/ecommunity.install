@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * Clenup - drupal core update
+ * For more information, see 'https://www.drupal.org/node/2487215'
+ */
+function ecommunity_update_7001() {
+  $modules = array(
+    'advanced_forum',
+    'scald_dailymotion',
+    'scald_vimeo',
+    'scald_youtube',
+  );
+  db_delete('system')
+    ->condition('name', $modules, 'IN')
+    ->condition('type', 'module')
+    ->execute();
+}
