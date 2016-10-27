@@ -41,6 +41,8 @@ services:
       - ./docroot:/var/www/html
       - .docker/web/php.ini:/usr/local/etc/php/php.ini
       - ./docroot/sites/default/files:/var/www/html/sites/default/files
+      - ./private:/var/local/migratoryspecies/files_private
+      - ./tmp:/var/local/migratoryspecies/tmp
     depends_on:
       - db
       - solr
