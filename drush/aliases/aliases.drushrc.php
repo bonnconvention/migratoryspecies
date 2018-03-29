@@ -3,7 +3,7 @@
 $aliases['prod'] = array(
   'uri' => 'migratoryspecies.org',
   'db-allows-remote' => TRUE,
-  'remote-host' => 'cms.int',
+  'remote-host' => 'unep-aewa.org',
   'remote-user' => 'php',
   'root' => '/var/local/migratoryspecies/docroot',
   'path-aliases' => array(
