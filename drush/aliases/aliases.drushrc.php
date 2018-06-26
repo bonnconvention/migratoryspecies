@@ -3,12 +3,17 @@
 $aliases['prod'] = array(
   'uri' => 'migratoryspecies.org',
   'db-allows-remote' => TRUE,
-  'remote-host' => 'cms.int',
+  'remote-host' => 'www.unep-aewa.org',
   'remote-user' => 'php',
   'root' => '/var/local/migratoryspecies/docroot',
   'path-aliases' => array(
     '%files' => 'sites/default/files',
-  )
+  ),
+  'command-specific' => array(
+    'sql-sync' => array(
+      'simulate' => '1',
+    ),
+  ),
 );
 
 // Add your local aliases.

@@ -1,4 +1,7 @@
-(function ($) {
+(function ($, Drupal) {
+  /*global jQuery:false */
+  /*global Drupal:false */
+  "use strict";
 
   /**
    * Provide vertical tab summaries for Bootstrap settings.
@@ -7,48 +10,65 @@
     attach: function (context) {
       var $context = $(context);
 
-      // BootstrapCDN.
-      $context.find('#edit-bootstrap-cdn').drupalSetSummary(function () {
-        var version = $context.find('select[name="bootstrap_cdn"]').val();
-        if (version.length) {
-          return version;
+      // General.
+      $context.find('#edit-general').drupalSetSummary(function () {
+        var summary = [];
+        // Buttons.
+        var size = $context.find('select[name="bootstrap_button_size"] :selected');
+        if (size.val()) {
+          summary.push(Drupal.t('@size Buttons', {
+            '@size': size.text()
+          }));
         }
-        else {
-          return Drupal.t('Disabled');
+
+        // Images.
+        var shape = $context.find('select[name="bootstrap_image_shape"] :selected');
+        if (shape.val()) {
+          summary.push(Drupal.t('@shape Images', {
+            '@shape': shape.text()
+          }));
         }
+        if ($context.find(':input[name="bootstrap_image_responsive"]').is(':checked')) {
+          summary.push(Drupal.t('Responsive Images'));
+        }
+
+        // Tables.
+        if ($context.find(':input[name="bootstrap_table_responsive"]').is(':checked')) {
+          summary.push(Drupal.t('Responsive Tables'));
+        }
+
+        return summary.join(', ');
+
       });
 
-      // Bootswatch.
-      $context.find('#edit-bootswatch').drupalSetSummary(function () {
-        var theme = $context.find('select[name="bootstrap_bootswatch"]').val();
-        if (theme.length) {
-          return $context.find('select[name="bootstrap_bootswatch"] :selected').text();
-        }
-        else {
-          return Drupal.t('Disabled');
-        }
-      });
-
-      // Breadcrumbs.
-      $context.find('#edit-breadcrumbs').drupalSetSummary(function () {
-        var summary = [$context.find('select[name="bootstrap_breadcrumb"] :selected').text()];
+      // Components.
+      $context.find('#edit-components').drupalSetSummary(function () {
+        var summary = [];
+        // Breadcrumbs.
         var breadcrumb = parseInt($context.find('select[name="bootstrap_breadcrumb"]').val(), 10);
         if (breadcrumb) {
-          if ($context.find('input[name="bootstrap_breadcrumb_home"]').is(':checked')) {
-            summary.push(Drupal.t('Home breadcrumb link'));
-          }
-          if ($context.find('input[name="bootstrap_breadcrumb_title"]').is(':checked')) {
-            summary.push(Drupal.t('Current page title'));
-          }
+          summary.push(Drupal.t('Breadcrumbs'));
         }
+        // Navbar.
+        var navbar = 'Navbar: ' + $context.find('select[name="bootstrap_navbar_position"] :selected').text();
+        if ($context.find('input[name="bootstrap_navbar_inverse"]').is(':checked')) {
+          navbar += ' (' + Drupal.t('Inverse') + ')';
+        }
+        summary.push(navbar);
         return summary.join(', ');
       });
 
-      // Navbar.
-      $context.find('#edit-navbar').drupalSetSummary(function () {
-        var summary = [$context.find('select[name="bootstrap_navbar_position"] :selected').text()];
-        if ($context.find('input[name="bootstrap_navbar_inverse"]').is(':checked')) {
-          summary.push(Drupal.t('Inverse'));
+      // Javascript.
+      $context.find('#edit-javascript').drupalSetSummary(function () {
+        var summary = [];
+        if ($context.find('input[name="bootstrap_anchors_fix"]').is(':checked')) {
+          summary.push(Drupal.t('Anchors'));
+        }
+        if ($context.find('input[name="bootstrap_popover_enabled"]').is(':checked')) {
+          summary.push(Drupal.t('Popovers'));
+        }
+        if ($context.find('input[name="bootstrap_tooltip_enabled"]').is(':checked')) {
+          summary.push(Drupal.t('Tooltips'));
         }
         return summary.join(', ');
       });
@@ -56,8 +76,22 @@
       // Advanced.
       $context.find('#edit-advanced').drupalSetSummary(function () {
         var summary = [];
-        if ($context.find('input[name="bootstrap_rebuild_registry"]').is(':checked')) {
-          summary.push(Drupal.t('Rebuild Registry'));
+        var $cdnProvider = $context.find('select[name="bootstrap_cdn_provider"] :selected');
+        var cdnProvider = $cdnProvider.val();
+        if ($cdnProvider.length && cdnProvider.length) {
+          summary.push(Drupal.t('CDN provider: %provider', { '%provider': $cdnProvider.text() }));
+
+          // jsDelivr CDN.
+          if (cdnProvider === 'jsdelivr') {
+            var $jsDelivrVersion = $context.find('select[name="bootstrap_cdn_jsdelivr_version"] :selected');
+            if ($jsDelivrVersion.length && $jsDelivrVersion.val().length) {
+              summary.push($jsDelivrVersion.text());
+            }
+            var $jsDelivrTheme = $context.find('select[name="bootstrap_cdn_jsdelivr_theme"] :selected');
+            if ($jsDelivrTheme.length && $jsDelivrTheme.val() !== 'bootstrap') {
+              summary.push($jsDelivrTheme.text());
+            }
+          }
         }
         return summary.join(', ');
       });
@@ -65,36 +99,40 @@
   };
 
   /**
-   * Provide Bootstrap Bootswatch preview.
+   * Provide BootstrapCDN (via jsDelivr) theme preview.
    */
-  Drupal.behaviors.bootstrapBootswatchPreview = {
+  Drupal.behaviors.bootstrapThemePreview = {
     attach: function (context) {
       var $context = $(context);
-      var $preview = $context.find('#bootswatch-preview');
-      $preview.once('bootswatch', function () {
-        $.get("http://api.bootswatch.com/3/", function (data) {
-          var themes = data.themes;
-          for (var i = 0, len = themes.length; i < len; i++) {
-            $('<a/>').attr({
-              id: themes[i].name.toLowerCase(),
-              class: 'bootswatch-preview element-invisible',
-              href: themes[i].preview,
-              target: '_blank'
-            }).html(
-              $('<img/>').attr({
-                src: themes[i].thumbnail,
-                alt: themes[i].name
-              })
-            )
-            .appendTo($preview);
-          }
-          $preview.parent().find('select[name="bootstrap_bootswatch"]').bind('change', function () {
-            $preview.find('.bootswatch-preview').addClass('element-invisible');
-            if ($(this).val().length) {
-              $preview.find('#' + $(this).val()).removeClass('element-invisible');
+      var $preview = $context.find('#bootstrap-theme-preview');
+      $preview.once('bootstrap-theme-preview', function () {
+        // Construct the "Bootstrap Theme" preview here since it's not actually
+        // a Bootswatch theme, but rather one provided by Bootstrap itself.
+        // Unfortunately getbootstrap.com does not have HTTPS enabled, so the
+        // preview image cannot be protocol relative.
+        // @todo Make protocol relative if/when Bootstrap enables HTTPS.
+        $preview.append('<a id="bootstrap-theme-preview-bootstrap_theme" class="bootswatch-preview element-invisible" href="https://getbootstrap.com/docs/3.3/examples/theme/" target="_blank"><img class="img-responsive" src="https://getbootstrap.com/docs/3.3/examples/screenshots/theme.jpg" alt="' + Drupal.t('Preview of the Bootstrap theme') + '" /></a>');
+
+        // Retrieve the Bootswatch theme preview images.
+        // @todo This should be moved into PHP.
+        $.ajax({
+          url: 'https://bootswatch.com/api/3.json',
+          dataType: 'json',
+          success: function (json) {
+            var themes = json.themes;
+            for (var i = 0, len = themes.length; i < len; i++) {
+              $preview.append('<a id="bootstrap-theme-preview-' + themes[i].name.toLowerCase() + '" class="bootswatch-preview element-invisible" href="' + themes[i].preview + '" target="_blank"><img class="img-responsive" src="' + themes[i].thumbnail.replace(/^http:/, 'https:') + '" alt="' + Drupal.t('Preview of the @title Bootswatch theme', { '@title': themes[i].name }) + '" /></a>');
             }
-          }).change();
-        }, "json");
+          },
+          complete: function () {
+            $preview.parent().find('select[name="bootstrap_cdn_jsdelivr_theme"]').bind('change', function () {
+              $preview.find('.bootswatch-preview').addClass('element-invisible');
+              if ($(this).val().length) {
+                $preview.find('#bootstrap-theme-preview-' + $(this).val()).removeClass('element-invisible');
+              }
+            }).change();
+          }
+        });
       });
     }
   };
@@ -141,4 +179,4 @@
     }
   };
 
-})(jQuery);
+})(jQuery, Drupal);
