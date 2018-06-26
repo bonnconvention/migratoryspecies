@@ -97,48 +97,36 @@ function title_field_formatter_settings_summary($field, $instance, $view_mode) {
  */
 function title_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   $settings = $display['settings'];
-  $output = '';
-  if (isset($items[0]['safe_value'])) {
-    $output = $items[0]['safe_value'];
+  $output = isset($items[0]) ? $items[0]['safe_value'] : '';
+
+  if (!empty($output) && $settings['title_link'] == 'content') {
+    $uri = entity_uri($entity_type, $entity);
+    $output = l($output, $uri['path'], array('html' => TRUE));
   }
-  elseif (isset($items[0]['value'])) {
-    $output = _text_sanitize($instance, $langcode, $items[0], 'value');
-  }
-  $element = array();
 
-  if (!empty($output)) {
-    if ($settings['title_link'] == 'content') {
-      $uri = entity_uri($entity_type, $entity);
-      $options = array('html' => TRUE);
-      if (!empty($uri['options'])) {
-        $options = array_merge($options, $uri['options']);
-      }
-      $output = l($output, $uri['path'], $options);
-    }
+  $wrap_tag = empty($settings['title_style']) ? '_none' : $settings['title_style'];
 
-    $wrap_tag = empty($settings['title_style']) ? '_none' : $settings['title_style'];
-
-    if ($wrap_tag != '_none') {
-      $variables = array(
-        'element' => array(
-          '#tag' => $wrap_tag,
-          '#value' => $output,
-        ),
-      );
-
-      if (!empty($settings['title_class'])) {
-        $variables['element']['#attributes'] = array('class' => $settings['title_class']);
-      }
-
-      $output = theme('html_tag', $variables);
-    }
-
+  if ($wrap_tag != '_none') {
     $element = array(
-      array(
-        '#markup' => $output,
+      'element' => array(
+        '#tag' => $wrap_tag,
+        '#value' => $output,
       ),
     );
+
+    if (!empty($settings['title_class'])) {
+      $element['#attributes'] = array('class' => $settings['title_class']);
+    }
+
+    $output = theme('html_tag', $element);
   }
+
+  $element = array(
+    array(
+      '#markup' => $output,
+    ),
+  );
+
   return $element;
 }
 
