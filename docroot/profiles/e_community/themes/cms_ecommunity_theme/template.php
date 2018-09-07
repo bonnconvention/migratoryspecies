@@ -13,7 +13,7 @@ require_once dirname(__FILE__)."/templates/profile2/profile.func.php";
 
 function cms_ecommunity_theme_preprocess_html(&$variables) {
     drupal_add_css(
-        'http://fonts.googleapis.com/css?family=Lato:400,700,900,400italic', array('type' => 'external')
+        'https://fonts.googleapis.com/css?family=Lato:400,700,900,400italic', array('type' => 'external')
     );
     // Add conditional CSS for IE8
     drupal_add_css(path_to_theme() . '/css/ie8.css', array('media'=>'screen','group' => CSS_THEME, 'browsers' => array('IE' => 'IE 8', '!IE' => FALSE), 'weight' => 999, 'preprocess' => FALSE));
