@@ -12,7 +12,7 @@
  */
 abstract class CMSWebService {
 
-    private static $instruments = array('cms', 'aewa', 'ascobans', 'eurobats');
+    private static $instruments = array('cms', 'aewa', 'ascobans');
     private static $EXPIRE_CACHE_DEFAULT = 3600;
 
 
