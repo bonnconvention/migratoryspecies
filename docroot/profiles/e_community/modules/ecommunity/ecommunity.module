@@ -1228,3 +1228,17 @@ function ecommunity_form_views_exposed_form_alter(&$form, $form_state, $form_id)
     $form['sm_vid_Document_type_vocabulary']['#options'] = _ecommunity_documents_types_options();
   }
 }
+
+/**
+ * Implements hook_entity_load().
+ */
+function ecommmunity_entity_load($entities, $type) {
+  global $conf;
+  if ($type == 'search_api_server') {
+    foreach ($entities as &$entity) {
+      if (!empty($conf['search_api_server_core'])) {
+        $entity->options['core'] = $conf['search_api_server_core'];
+      }
+    }
+  }
+}
