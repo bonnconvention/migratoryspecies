@@ -29,18 +29,18 @@ stylesheets[all][] = css/mobile.css
  
 ; Scripts
  
-scripts[] = 'bootstrap-3.0.0/js/affix.js'
-scripts[] = 'bootstrap-3.0.0/js/alert.js'
-scripts[] = 'bootstrap-3.0.0/js/button.js'
-scripts[] = 'bootstrap-3.0.0/js/carousel.js'
-scripts[] = 'bootstrap-3.0.0/js/collapse.js'
-scripts[] = 'bootstrap-3.0.0/js/dropdown.js'
-scripts[] = 'bootstrap-3.0.0/js/modal.js'
-scripts[] = 'bootstrap-3.0.0/js/tooltip.js'
-scripts[] = 'bootstrap-3.0.0/js/popover.js'
-scripts[] = 'bootstrap-3.0.0/js/scrollspy.js'
-scripts[] = 'bootstrap-3.0.0/js/tab.js'
-scripts[] = 'bootstrap-3.0.0/js/transition.js'
+scripts[] = 'bootstrap/js/affix.js'
+scripts[] = 'bootstrap/js/alert.js'
+scripts[] = 'bootstrap/js/button.js'
+scripts[] = 'bootstrap/js/carousel.js'
+scripts[] = 'bootstrap/js/collapse.js'
+scripts[] = 'bootstrap/js/dropdown.js'
+scripts[] = 'bootstrap/js/modal.js'
+scripts[] = 'bootstrap/js/tooltip.js'
+scripts[] = 'bootstrap/js/popover.js'
+scripts[] = 'bootstrap/js/scrollspy.js'
+scripts[] = 'bootstrap/js/tab.js'
+scripts[] = 'bootstrap/js/transition.js'
 ; Settings inherited by base theme, uncomment to override.
 ;settings[toggle_name] = 0
 ;settings[toggle_search] = 1
