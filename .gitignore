@@ -71,3 +71,5 @@ Thumbs.db
 ###############################################
 !docroot/sites/all/modules/osha/osha_migration/data/test/export/*/file/*.zip
 tmp
+
+robo.yml
