@@ -69,10 +69,15 @@ function edw_healthcheck_content($type = "all") {
  * @return array
  */
 function process_data($type) {
+  if (in_array($type, ['all', 'core', 'modules'])) {
+    module_load_include('inc', 'update', 'update.fetch');
+    _update_refresh();
+  }
+
   $data = array();
   switch ($type) {
     case "all":
-      $data = array_merge(get_core_data(), get_modules_data(), get_themes_data(), get_cron_data());
+      $data = array_merge(get_core_data(), get_modules_data(), get_cron_data());
       break;
 
     case "core":
@@ -118,17 +123,19 @@ function get_core_data() {
  */
 function get_modules_data() {
   $plugin_data = array();
-  if ($available = update_get_available(FALSE)) {
+  if ($available = update_get_available()) {
     $data = system_rebuild_module_data();
 
     foreach ($data as $module_name => $info) {
       if ($module_name == "drupal" || $info->info["package"] == "Core" || $info->info["package"] == "Testing") {
-        // Do Nothing.
+        continue;
       }
-      else {
-        $info->project_type = 'module';
-        $plugin_data[$module_name] = $info;
+
+      $info->project_type = 'module';
+      if (empty($info->releases) && !empty($available[$module_name]['releases'])) {
+        $info->releases = $available[$module_name]['releases'];
       }
+      $plugin_data[$module_name] = $info;
     }
   }
   return $plugin_data;
