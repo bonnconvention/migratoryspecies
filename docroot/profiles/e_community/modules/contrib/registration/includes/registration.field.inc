@@ -20,7 +20,9 @@ function registration_field_info() {
           'capacity' => 0,
           'scheduling' => array(
             'open' => NULL,
+            'open_date_token' => NULL,
             'close' => NULL,
+            'close_date_token' => NULL,
           ),
           'reminder' => array(
             'send_reminder' => 0,
@@ -36,6 +38,7 @@ function registration_field_info() {
           ),
         ),
       ),
+      'property_type' => 'text',
       'default_widget' => 'registration_select',
       'default_formatter' => 'registration_default',
       'no_ui' => FALSE,

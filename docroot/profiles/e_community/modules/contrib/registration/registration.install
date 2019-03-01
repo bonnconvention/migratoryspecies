@@ -50,8 +50,8 @@ function registration_schema() {
         'not null' => TRUE,
         'default' => 1,
       ),
-      'user_uid' => array(
-        'description' => 'The uid of the user associated with this registration.',
+      'registrant_id' => array(
+        'description' => 'The entity id of the registrant associated with this registration.',
         'type' => 'int',
         'not null' => FALSE,
         'default' => 0,
@@ -93,10 +93,6 @@ function registration_schema() {
         'table' => 'users',
         'columns' => array('author_uid' => 'uid'),
       ),
-      'registration_user' => array(
-        'table' => 'users',
-        'columns' => array('user_uid' => 'uid'),
-      ),
       'registration_state' => array(
         'table' => 'registration_state',
         'columns' => array('state' => 'name'),
@@ -121,7 +117,7 @@ function registration_schema() {
         'default' => '',
       ),
       'capacity' => array(
-        'description' => 'Maximum number of users who can signup for this event.',
+        'description' => 'Maximum number of registrants who can sign up for this event.',
         'type' => 'int',
         'unsigned' => TRUE,
         'not null' => TRUE,
@@ -163,6 +159,13 @@ function registration_schema() {
         'sqlsrv_type' => 'smalldatetime',
         'not null' => FALSE,
       ),
+      'open_date_token' => array(
+        'description' => 'Token value to determine open date.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => NULL,
+      ),
       'close' => array(
         'description' => 'Date to close registrations. Or NULL to never close automatically.',
         'type' => 'datetime',
@@ -171,6 +174,13 @@ function registration_schema() {
         'sqlite_type' => 'varchar',
         'sqlsrv_type' => 'smalldatetime',
         'not null' => FALSE,
+      ),
+      'close_date_token' => array(
+        'description' => 'Token value to determine close date.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => NULL,
       ),
       'settings' => array(
         'type' => 'blob',
@@ -246,6 +256,27 @@ function registration_schema() {
         'type' => 'varchar',
         'length' => 255,
         'not null' => FALSE,
+      ),
+      'registrant_entity_type' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => 'user',
+        'description' => 'The machine name of the registrant entity\'s type.',
+      ),
+      'registrant_bundle' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => 'user',
+        'description' => 'The machine name of the registrant entity\'s bundle.',
+      ),
+      'registrant_email_property' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => 'mail',
+        'description' => 'The machine name of the registrant entity\'s email property.',
       ),
     ),
     'primary key' => array('id'),
@@ -590,7 +621,7 @@ function registration_update_7105(&$sandbox) {
 }
 
 /**
- * Add the new default_state field to the registration_type table.
+ * Add the new default_state field to the registration_type table
  */
 
 function registration_update_7106(&$sandbox) {
@@ -614,40 +645,81 @@ function registration_update_7107() {
 }
 
 /**
- * Grant new "register self" permission for backwards compatibility.
+ * Add registrant entity fields to the registration_type table
  */
-function registration_update_7108(&$sandbox) {
-  // The old "create $type registration" is now subdivided into "create $type
-  // registration" and "create $type registration self". To preserve backwards
-  // compatibility, grant the new permission to any role who already has the
-  // old one.
-  foreach (registration_get_types() as $type_info) {
-    $old_permission = "create {$type_info->name} registration";
-    $existing = db_select('role_permission', 'r')
-      ->condition('permission', $old_permission)
-      ->fields('r', array('rid'))
-      ->execute();
-    if (empty($existing)) {
-      return;
-    }
-    $new_permission = "create {$type_info->name} registration self";
-    foreach ($existing as $record) {
-      // Make sure the user has not fixed the permissions themselves.
-      $perm_given = db_select('role_permission', 'r')
-        ->condition('permission', $new_permission)
-        ->fields('r', array('rid'))
-        ->execute();
-      if (!empty($perm_given)) {
-        continue;
-      }
+function registration_update_7200(&$sandbox) {
+  if (!db_field_exists('registration_type', 'registrant_entity_type')) {
+    db_add_field('registration_type', 'registrant_entity_type',
+      array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => 'user',
+        'description' => 'The machine name of the registrant entity\'s type.',
+      )
+    );
+  }
 
-      db_insert('role_permission')
-        ->fields(array(
-          'rid' => $record->rid,
-          'module' => 'registration',
-          'permission' => $new_permission,
-        ))
-        ->execute();
+  if (!db_field_exists('registration_type', 'registrant_bundle')) {
+    db_add_field('registration_type', 'registrant_bundle',
+      array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => 'user',
+        'description' => 'The machine name of the registrant entity\'s bundle.',
+      )
+    );
+  }
+
+  if (!db_field_exists('registration_type', 'registrant_email_property')) {
+    db_add_field('registration_type', 'registrant_email_property',
+      array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => 'mail',
+        'description' => 'The machine name of the registrant entity\'s email property.',
+      )
+    );
+  }
+}
+
+/**
+ * Rename user id to registrant id because we are registering more than just users.
+ */
+function registration_update_7201(&$sandbox) {
+  db_change_field('registration', 'user_uid', 'registrant_id', array(
+    'description' => 'The entity id of the registrant associated with this registration.',
+    'type' => 'int',
+    'not null' => FALSE,
+    'default' => 0,
+  ));
+}
+
+/**
+ * Add token field for open and close date on Registration configuration.
+ */
+function registration_update_7202() {
+  $token_fields = array(
+    'open_date_token' => array(
+      'description' => 'Token value to determine open date.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => NULL,
+    ),
+    'close_date_token' => array(
+      'description' => 'Token value to determine close date.',
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => NULL,
+    ),
+  );
+  foreach ($token_fields as $name => $config) {
+    if (!db_field_exists('registration_entity', $name)) {
+      db_add_field('registration_entity', $name, $config);
     }
   }
 }

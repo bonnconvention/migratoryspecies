@@ -15,8 +15,8 @@ class Registration extends Entity {
     $type,
     $entity_id,
     $entity_type,
-    $anon_mail = NULL,
-    $user_uid = NULL,
+    $anon_mail,
+    $registrant_id,
     $count,
     $author_uid,
     $state,
@@ -52,7 +52,8 @@ class Registration extends Entity {
     $host_entity = $wrapper->entity->value();
     $state = $wrapper->state->value();
     $author = $wrapper->author->value();
-    $user = $wrapper->user->value();
+    $registrant_type = $wrapper->registrant->type();
+    $registrant = $wrapper->registrant->value();
     list(, , $host_entity_bundle) = entity_extract_ids($this->entity_type, $host_entity);
 
     $host_label = entity_label($this->entity_type, $host_entity);
@@ -64,27 +65,25 @@ class Registration extends Entity {
       '#label' => t('Email Address'),
       '#items' => array(
         array(
-          '#markup' => $wrapper->mail->value(),
+          '#markup' => $wrapper->registrant_mail->value(),
         ),
       ),
       '#classes' => 'field field-label-inline clearfix',
     );
 
     // Link to host entity.
-    if(isset($host_uri['path'])){
-      $host_entity_link_label = (isset($host_entity_type_info['bundles'][$host_entity_bundle]['label'])) ? '<div class="field-label">' . $host_entity_type_info['bundles'][$host_entity_bundle]['label'] . '</div>' : '';
+    $host_entity_link_label = (isset($host_entity_type_info['bundles'][$host_entity_bundle]['label'])) ? '<div class="field-label">' . $host_entity_type_info['bundles'][$host_entity_bundle]['label'] . '</div>' : '';
 
-      $build['host_entity_link'] = array(
-        '#theme' => 'registration_property_field',
-        '#label' => $host_entity_link_label,
-        '#items' => array(
-          array(
-            '#markup' => l($host_label, $host_uri['path']),
-          ),
+    $build['host_entity_link'] = array(
+      '#theme' => 'registration_property_field',
+      '#label' => $host_entity_link_label,
+      '#items' => array(
+        array(
+          '#markup' => l($host_label, $host_uri['path']),
         ),
-        '#classes' => 'field field-label-inline clearfix',
-      );
-    }
+      ),
+      '#classes' => 'field field-label-inline clearfix',
+    );
 
     $build['created'] = array(
       '#theme' => 'registration_property_field',
@@ -133,19 +132,20 @@ class Registration extends Entity {
       );
     }
 
-    if ($user) {
-      $build['user'] = array(
-        '#theme' => 'registration_property_field',
-        '#label' => t('User'),
-        '#items' => array(
-          array(
-            '#markup' => theme('username', array('account' => $user)),
-          ),
+    $build['registrant'] = array(
+      '#theme' => 'registration_property_field',
+      '#label' => t('Registrant'),
+      '#items' => array(
+        array(
+          '#markup' => theme('registration_registrant_link', array(
+            'registrant_type' => $registrant_type,
+            'registrant' => $registrant,
+          )),
         ),
-        '#classes' => 'field field-label-inline clearfix',
-        '#attributes' => '',
-      );
-    }
+      ),
+      '#classes' => 'field field-label-inline clearfix',
+      '#attributes' => '',
+    );
 
     $build['state'] = array(
       '#theme' => 'registration_property_field',
@@ -190,31 +190,6 @@ class Registration extends Entity {
    */
   protected function defaultUri() {
     return array('path' => 'registration/' . $this->internalIdentifier());
-  }
-
-  /**
-   * Determine registrant type relative to a given account.
-   *
-   * @object $account
-   *   A Drupal user
-   *
-   * @return string|NULL
-   *   Can be me, user, anon or NULL if account is empty and no anon email set.
-   */
-  public function registrant_type($account) {
-    $reg_type = NULL;
-    if (!empty($account)) {
-      if ($account->uid && $account->uid === $this->user_uid) {
-        $reg_type = REGISTRATION_REGISTRANT_TYPE_ME;
-      }
-      elseif ($this->user_uid) {
-        $reg_type = REGISTRATION_REGISTRANT_TYPE_USER;
-      }
-    }
-    if (!empty($this->anon_mail)) {
-      $reg_type = REGISTRATION_REGISTRANT_TYPE_ANON;
-    }
-    return $reg_type;
   }
 
 }
