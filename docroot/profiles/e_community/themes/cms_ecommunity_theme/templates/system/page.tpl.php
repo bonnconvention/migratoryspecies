@@ -43,7 +43,7 @@
             </div>
 
             <?php if (!empty($page['sidebar_second'])): ?>
-                <aside class="col-md-4 right-column" role="complementary"reg>
+                <aside class="col-md-4 right-column" role="complementary">
                     <div class="well region region-sidebar-second">
                         <?php print render($page['sidebar_second']); ?>
                     </div>
