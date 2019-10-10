@@ -12,8 +12,9 @@ MAINTAINERS.txt
 README.txt
 UPGRADE.txt
 web.config
-docroot/sites/*/settings*.php
+docroot/sites/*/settings.local.php
 *.local.php
+!docroot/sites/*/example.settings.local.php
 drush/aliases/aliases.local.php
 conf/apache.conf
 conf/config.json
